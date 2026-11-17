@@ -312,6 +312,7 @@ TEMPLATE = r"""<!doctype html>
   <div class="big top">
     <a class="card" href="ai/"><b>🤖 Fråga AI · Ask the AI</b><span>Skriv eller prata på svenska. Svarar ur böckerna och visar källan, kan titta på foton. Guide på sidan.</span></a>
     <a class="card" href="map/"><b>🗺 Karta · Map</b><span>Sök gata och adress, hitta närmaste sjukhus, apotek och dricksvatten.</span></a>
+    <a class="card" href="map/?gps=1"><b>📍 Var är jag? · Where am I</b><span>Din position på kartan med en USB GPS-mottagare i datorn, utan internet.</span></a>
     <a class="card" href="skriv-ut/"><b>🖨 Skriv ut · Print</b><span>Första hjälpen, varningar, vatten och värme på papper. Gör det nu, medan det finns ström.</span></a>
     <a class="card" href="checklista/"><b>✅ Checklista · Checklist</b><span>Har du det du behöver för en vecka? MCF:s lista att bocka av.</span></a>
   </div>
@@ -330,7 +331,6 @@ TEMPLATE = r"""<!doctype html>
   <div class="big">
     <a class="card" href="map/"><b>Karta över Sverige</b><span>Zooma in till enskilda hus. Sök adress, tryck för koordinater</span></a>
     <a class="card" href="docs/"><b>Alla dokument</b><span>Broschyrer och hela boksamlingen som PDF</span></a>
-    <a class="card" href="mobil/"><b>📍 GPS på mobilen</b><span>Se var du är på kartan med mobilens GPS, utan internet. Ställ in en gång per mobil</span></a>
   </div>
 
   <h2>Alla bibliotek · All libraries</h2>

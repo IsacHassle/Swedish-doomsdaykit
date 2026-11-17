@@ -56,6 +56,7 @@ Resten av sidan är bruksanvisningen. Samma text finns i utskriftsguiden, och AI
     - **en sökruta** över alla bibliotek (engelska ord fungerar bäst, det finns en svensk knapp också)
     - **🤖 Fråga AI**: fråga AI:n på svenska, se guiden nedan
     - **🗺 Karta**: kartan över Sverige, med adressökning
+    - **📍 Var är jag?**: din position på kartan, med en USB GPS-mottagare i datorn
     - **🖨 Skriv ut**: det viktigaste från 1177, MCF och Livsmedelsverket på papper, att skriva ut medan det finns ström
     - **✅ Checklista**: MCF:s lista för hemberedskap att bocka av, plus det krislådan själv behöver
     - **29 akutknappar**: hjärt-lungräddning, blödning, brännskador, nedkylning, kolmonoxid, förgiftning, förlossning med mera. De flesta öppnar 1177:s eller MCF:s råd på svenska, med den engelska artikeln ett tryck bort
@@ -156,7 +157,8 @@ En offline-karta över hela Sverige (med delar av Norge, Finland och Danmark i s
 - **Sök** efter vilken ort, by, gata eller adress som helst i Sverige, till exempel *Hornsgatan 50* eller *Storgatan 30, Umeå*. Saknas ett husnummer i OpenStreetMap sätts nålen mellan grannhusen, och kartan säger att läget är ungefärligt.
 - **Närmaste**-knapparna listar de närmaste 🏥 sjukhusen, 🩺 vårdcentralerna, 💊 apoteken, 👮 polisstationerna, 🚒 brandstationerna, 🚰 dricksvattenställena, 🛒 matbutikerna och ⛽ bensinstationerna från kartans mitt.
 - Knapparna **Stockholm** och **Sverige** hoppar dit.
-- **⦿ visar var du är**, med mobilens GPS, helt utan internet. Då räknar också närmaste-knapparna från där du står. Mobilen måste öppna kartan säkert (https), så varje mobil ställs in en gång: öppna **📍 GPS på mobilen** på startsidan (adressen `/mobil/`) och följ stegen för iPhone eller Android. Krislådan gör ett eget certifikat för det, som bara gäller adresser i ditt hemnätverk (`.local` och 192.168…) och inte kan användas för webbplatser på internet. Macen själv har ingen GPS.
+- **📍 Var är jag?** visar din position på kartan, följer med när du rör dig, och då räknar närmaste-knapparna från där du står ("1,2 km från dig"). Det fungerar helt utan internet, men **Macen har ingen egen GPS**: koppla in en **USB GPS-mottagare**. Sök efter "USB GPS" (de flesta har en u-blox-krets och kostar cirka 200–400 kr), och skaffa en USB-C-adapter om datorn bara har USB-C. Krislådan hittar mottagaren själv, inga drivrutiner behövs. Första gången kan den behöva några minuter vid ett fönster eller utomhus för att hitta satelliterna. Utan mottagare: sök på en gata, adress eller plats du ser omkring dig.
+- Mobiler kan också visa sin egen position med sin GPS, efter en inställning per mobil: öppna `/mobil/` på mobilen och följ stegen. Krislådan gör ett eget certifikat för det, som bara gäller adresser i ditt hemnätverk och inte kan användas för webbplatser på internet.
 - **Tryck** på kartan för att läsa av exakta koordinater, som du kan skicka vidare via radio eller skriva ner.
 
 ### 5. Fler bibliotek, om du har plats
@@ -197,6 +199,7 @@ Kartans sökning kan byggas om från färsk OpenStreetMap-data med `scripts/buil
 - Installera **Organic Maps** på mobilen och ladda ner Sverige: en andra karta som klarar sig i dagar på en powerbank.
 - Installera **Kiwix** på mobilen och kopiera över de medicinska biblioteken.
 - Skaffa en batteri- eller vevradio för P4, och en powerbank eller ett batteripaket för Macen.
+- Skaffa en **USB GPS-mottagare** till datorn (cirka 200–400 kr), så visar kartan var du är utan internet. Testa den en gång med 📍 på kartan.
 
 ## Tack och licenser
 

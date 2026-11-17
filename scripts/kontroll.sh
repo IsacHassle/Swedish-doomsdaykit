@@ -38,6 +38,18 @@ else bad "Kartans sökning saknas. Kör installationen igen."; fi
 if [ -f "$KIT/tools/certs/server.crt" ]; then ok "https för mobilens GPS (certifikat finns)"
 else echo "  ℹ️  https för mobilens GPS skapas när du startar Krislådan första gången."; fi
 
+gpsdev=$(ls /dev/cu.usbmodem* /dev/cu.usbserial* /dev/cu.SLAB_USBtoUART* /dev/cu.wchusbserial* 2>/dev/null | head -1)
+if [ -n "$gpsdev" ]; then
+  fix=$(curl -fs --max-time 3 http://localhost:8091/ai-api/gps 2>/dev/null | python3 -c "import json,sys; d=json.load(sys.stdin); print('ja' if d.get('fix') else 'nej')" 2>/dev/null)
+  case "$fix" in
+    ja) ok "USB GPS-mottagare inkopplad och har position ($(basename "$gpsdev"))" ;;
+    nej) ok "USB GPS-mottagare inkopplad ($(basename "$gpsdev")), söker satelliter. Ställ den vid ett fönster." ;;
+    *) ok "USB GPS-mottagare inkopplad ($(basename "$gpsdev")). Starta Krislådan och tryck 📍 på kartan för att testa." ;;
+  esac
+else
+  echo "  ℹ️  Ingen USB GPS-mottagare inkopplad. Med en sådan visar kartan var du är utan internet (se guiden)."
+fi
+
 section "Dokument"
 n=$(find "$KIT/documents" -type f \( -name '*.pdf' -o -name '*.md' \) | wc -l | tr -d ' ')
 [ -s "$KIT/documents/Om-krisen-eller-kriget-kommer.pdf" ] && ok "Broschyren Om krisen eller kriget kommer" || bad "Broschyren saknas. Kör installationen igen med internet."

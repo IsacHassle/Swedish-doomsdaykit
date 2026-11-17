@@ -38,6 +38,9 @@
   .bar .grow { flex: 1; }
   #err { color: #b00020; margin-top: 6px; display: none; }
   #toggle { display: none; }
+  .gps-btn { font-size: 17px; }
+  .gps-btn.on { background: #cfe3ff !important; }
+  .gps-dot { width: 18px; height: 18px; border-radius: 50%; background: #1a73e8; border: 3px solid #fff; box-shadow: 0 0 0 2px rgba(26,115,232,.35), 0 1px 4px rgba(0,0,0,.4); }
   @media (max-width: 520px) {
     #panel { left: 8px; right: 56px; width: auto; max-width: none; top: 8px; }
     #panel.min .hide-min { display: none; }
@@ -89,6 +92,7 @@
   const root = new URL('../tiles/', location.href).href;   // where the .pmtiles live
   const $ = s => document.querySelector(s);
   const note = t => { $('#note').textContent = t || ''; };
+  const noteHtml = h => { $('#note').innerHTML = h; };   // only for the kit's own messages with a link
 
   // A map file is usable only if it starts with the PMTiles magic bytes.
   const isReady = url => fetch(url, { headers: { Range: 'bytes=0-6' } })
@@ -129,17 +133,18 @@
   };
   const fmtKm = d => d < 1 ? Math.round(d * 100) * 10 + ' m' : (d < 10 ? d.toFixed(1) : Math.round(d)) + ' km';
 
-  function show(list, map, withDistance) {
+  function show(list, map, withDistance, from) {
     const ul = $('#results');
     ul.innerHTML = '';
     const c = map.getCenter(), shown = [];
+    const origin = from || [c.lng, c.lat], fromText = from && gps.here && from === gps.here ? ' från dig' : ' från kartans mitt';
     for (const e of list) {
       // the same place is often mapped twice (a point and a building): show it once
       if (shown.some(o => o[0] === e[0] && o.t === e.t && km([o[2], o[3]], [e[2], e[3]]) < 0.4)) continue;
       shown.push(e);
       const li = document.createElement('li');
       li.tabIndex = 0;
-      const where = [e.t, e.a, withDistance ? fmtKm(km([e[2], e[3]], [c.lng, c.lat])) + ' från kartans mitt' : ''].filter(Boolean).join(' · ');
+      const where = [e.t, e.a, withDistance ? fmtKm(km([e[2], e[3]], origin)) + fromText : ''].filter(Boolean).join(' · ');
       li.innerHTML = '<b></b><small></small>';
       li.querySelector('b').textContent = e[0];
       li.querySelector('small').textContent = where;
@@ -272,15 +277,97 @@
     note('');
     const items = await loadIndex();
     const want = new Set(types.split(','));
-    const c = map.getCenter(), here = [c.lng, c.lat];
+    const c = map.getCenter(), here = gps.on && gps.here ? gps.here : [c.lng, c.lat];
     const list = items.filter(e => want.has(e.t)).map(e => [km([e[2], e[3]], here), e]).sort((a, b) => a[0] - b[0]).slice(0, 20).map(x => x[1]);
-    show(list, map, true);
+    show(list, map, true, here);
     if (!list.length) note('Inga hittades.');
   }
 
   function setCoords(lng, lat, label) {
     $('#coords').textContent = (label ? label + ': ' : '') +
       `${lat.toFixed(5)}, ${lng.toFixed(5)}  (${Math.abs(lat).toFixed(4)}°${lat >= 0 ? 'N' : 'S'} ${Math.abs(lng).toFixed(4)}°${lng >= 0 ? 'E' : 'W'})`;
+  }
+
+  // ---------- where am I (GPS) ----------
+  // First choice: a USB GPS receiver in the Mac, read by the kit's web server (/ai-api/gps).
+  // Otherwise the browser's own location: a phone's GPS (on https), or a Mac with internet.
+  const gps = {
+    on: false, timer: null, here: null, centre: true, usb: false, watch: null, dot: null, btn: null,
+    start(map) {
+      this.on = true; this.centre = true; this.btn && this.btn.classList.add('on');
+      $('#panel').classList.remove('min');
+      note('Söker din position…');
+      this.poll(map); this.timer = setInterval(() => this.poll(map), 2000);
+    },
+    stop() {
+      this.on = false; clearInterval(this.timer); this.btn && this.btn.classList.remove('on');
+      if (this.watch !== null) { navigator.geolocation.clearWatch(this.watch); this.watch = null; }
+      note('');
+    },
+    click(map) {
+      if (!this.on) return this.start(map);
+      if (!this.centre && this.here) { this.centre = true; map.flyTo({ center: this.here, zoom: Math.max(map.getZoom(), 16) }); return; }
+      this.stop();
+    },
+    async poll(map) {
+      let g = { device: null };
+      try { g = await (await fetch('/ai-api/gps', { cache: 'no-store' })).json(); } catch {}
+      if (!this.on) return;
+      this.usb = !!g.device;
+      if (g.device && g.fix) {
+        const acc = g.accuracy_m ? `, ±${Math.round(g.accuracy_m)} m` : '';
+        return this.show(map, g.lon, g.lat, g.accuracy_m, `Du är här (GPS, ${g.sats || '?'} satelliter${acc})`);
+      }
+      if (g.device) {
+        return note(`GPS-mottagaren söker satelliter${g.sats_in_view ? ` (${g.sats_in_view} syns)` : ''}. Ställ datorn vid ett fönster eller gå ut. Första gången kan det ta några minuter.`);
+      }
+      if (navigator.geolocation && window.isSecureContext) {
+        if (this.watch === null) this.watch = navigator.geolocation.watchPosition(
+          p => { if (!this.usb) this.show(map, p.coords.longitude, p.coords.latitude, p.coords.accuracy, `Du är här (±${Math.round(p.coords.accuracy)} m)`); },
+          () => { if (!this.usb && !this.here) noteHtml(NO_GPS); },
+          { enableHighAccuracy: true, timeout: 20000, maximumAge: 10000 });
+        return;
+      }
+      if (!this.here) noteHtml(NO_GPS + (('ontouchend' in document) ? ' På mobilen: <a href="/mobil/">ställ in GPS</a>.' : ''));
+    },
+    show(map, lon, lat, acc, label) {
+      this.here = [lon, lat];
+      if (!this.dot) {
+        const el = document.createElement('div'); el.className = 'gps-dot';
+        this.dot = new maplibregl.Marker({ element: el }).setLngLat(this.here).addTo(map);
+      } else this.dot.setLngLat(this.here);
+      const ring = circle(lon, lat, Math.max(acc || 0, 3));
+      if (map.getSource('gps-acc')) map.getSource('gps-acc').setData(ring);
+      else {
+        map.addSource('gps-acc', { type: 'geojson', data: ring });
+        map.addLayer({ id: 'gps-acc', type: 'fill', source: 'gps-acc', paint: { 'fill-color': '#1a73e8', 'fill-opacity': 0.15 } });
+      }
+      if (this.centre) map.easeTo({ center: this.here, zoom: Math.max(map.getZoom(), 16), duration: 800 });
+      setCoords(lon, lat, label);
+      note('');
+    },
+  };
+  const NO_GPS = 'Ingen GPS hittades. Macen har ingen egen GPS: koppla in en USB GPS-mottagare (se guiden). Utan GPS: sök på en gata, adress eller plats du ser omkring dig.';
+  const circle = (lon, lat, m) => {
+    const pts = [];
+    for (let i = 0; i <= 48; i++) {
+      const a = i / 48 * 2 * Math.PI;
+      pts.push([lon + (m / (111320 * Math.cos(lat * Math.PI / 180))) * Math.cos(a), lat + (m / 110574) * Math.sin(a)]);
+    }
+    return { type: 'Feature', geometry: { type: 'Polygon', coordinates: [pts] } };
+  };
+  class WhereAmI {
+    constructor(map) { this.map = map; }
+    onAdd() {
+      const el = document.createElement('div');
+      el.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+      el.innerHTML = '<button type="button" class="gps-btn" title="Var är jag? (GPS)" aria-label="Var är jag?">📍</button>';
+      gps.btn = el.querySelector('button');
+      gps.btn.onclick = () => gps.click(this.map);
+      this.map.on('dragstart', () => { gps.centre = false; });
+      return el;
+    }
+    onRemove() {}
   }
 
   // ---------- map ----------
@@ -314,35 +401,8 @@
     });
     window.kitMap = map;
     map.addControl(new maplibregl.NavigationControl(), 'top-right');
-    // Your position (the phone's GPS). Browsers only allow it on https pages or on the Mac itself;
-    // elsewhere the button explains how to set up the phone (web/mobil/).
-    if (window.isSecureContext) {
-      const geo = new maplibregl.GeolocateControl({ trackUserLocation: true, positionOptions: { enableHighAccuracy: true, timeout: 30000 } });
-      map.addControl(geo, 'top-right');
-      geo.on('geolocate', p => setCoords(p.coords.longitude, p.coords.latitude, `Du är här (±${Math.round(p.coords.accuracy)} m)`));
-      geo.on('error', e => {
-        const mac = /Mac/.test(navigator.platform) && !('ontouchend' in document);
-        note(e.code === 1 ? 'Platsåtkomst nekades. Tillåt plats för den här sidan i webbläsarens inställningar.'
-           : mac ? 'Macen har ingen GPS och hittar inte sin position utan internet. Använd mobilen för din position.'
-           : 'Hittade ingen GPS-signal än. Gå ut eller nära ett fönster och försök igen.');
-        $('#panel').classList.remove('min');
-      });
-    } else {
-      class GpsHelp {
-        onAdd() {
-          const el = document.createElement('div');
-          el.className = 'maplibregl-ctrl maplibregl-ctrl-group';
-          el.innerHTML = '<button type="button" title="Min position (GPS)" aria-label="Min position" style="font-size:18px">⦿</button>';
-          el.querySelector('button').onclick = () => {
-            $('#panel').classList.remove('min');
-            $('#note').innerHTML = 'För din position (GPS) behöver mobilen öppna kartan säkert, med https. <a href="/mobil/">Ställ in det en gång</a>, eller skriv in dina koordinater i sökrutan.';
-          };
-          return el;
-        }
-        onRemove() {}
-      }
-      map.addControl(new GpsHelp(), 'top-right');
-    }
+    map.addControl(new WhereAmI(map), 'top-right');
+    if (new URLSearchParams(location.search).has('gps')) map.once('load', () => gps.start(map));
     map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
     pin = new maplibregl.Marker({ color: '#d32f2f' });
 

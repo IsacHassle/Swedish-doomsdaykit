@@ -22,6 +22,8 @@ import sys
 import threading
 import urllib.parse
 
+import kit_gps   # the USB GPS receiver, if one is plugged in (scripts/kit_gps.py)
+
 KIT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # the kit folder
 ROOT = os.path.join(KIT, "web")
 DOCS = os.path.join(KIT, "documents")
@@ -227,6 +229,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(data)
             return
+        if url.path == "/ai-api/gps":   # where the Mac is, from a USB GPS receiver
+            return self.send_json(kit_gps.status())
         if url.path == "/ai-api/status":
             return self.ai_status()
         if url.path == "/ai-api/doc":
@@ -298,6 +302,7 @@ if __name__ == "__main__":
     http.server.ThreadingHTTPServer.daemon_threads = True
     if https_ready():
         threading.Thread(target=serve_https, daemon=True).start()
+    kit_gps.start()
     with http.server.ThreadingHTTPServer(("0.0.0.0", PORT), Handler) as httpd:
         print(f"Crisis kit on this Mac: http://localhost:{PORT}/")
         httpd.serve_forever()
