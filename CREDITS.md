@@ -69,3 +69,10 @@ Downloaded from msb.se / rib.msb.se, not redistributed.
 
 [Project N.O.M.A.D.](https://github.com/Crosstalk-Solutions/project-nomad) by Crosstalk Solutions (Apache 2.0),
 an offline knowledge server. This kit started from its library list and map style, rebuilt for a Mac and for Sweden.
+
+## The kit's look
+
+Fonts in `web/lib/fonts/`, all under the SIL Open Font Licence 1.1 (licence texts in the same folder):
+[Barlow](https://github.com/jpt/barlow) by Jeremy Tribby, based on public road signage;
+[Big Shoulders Stencil](https://github.com/xotypeco/big_shoulders) by Patric King;
+[IBM Plex Mono](https://github.com/IBM/plex) by IBM.

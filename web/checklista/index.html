@@ -7,31 +7,34 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-180.png">
 <meta name="theme-color" content="#0b5cad">
+<link rel="stylesheet" href="../lib/kit.css">
 <style>
-  :root { --bg:#f6f5f2; --fg:#1d1d1f; --muted:#5f5f66; --card:#ffffff; --line:#e3e1dc; --accent:#0b5cad; --fill:#0b5cad; --ok:#1e7a3c; }
-  @media (prefers-color-scheme: dark) { :root { --bg:#141416; --fg:#f2f2f4; --muted:#a3a3ab; --card:#1f1f23; --line:#2e2e34; --accent:#6aa9ff; --fill:#1f5fae; --ok:#6fd08c; } }
-  * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--fg); font:17px/1.5 -apple-system, system-ui, "Segoe UI", sans-serif; }
-  main { max-width: 760px; margin: 0 auto; padding: 16px; }
-  a { color: var(--accent); }
-  .bar { display:flex; gap:14px; flex-wrap:wrap; font-size:16px; } .bar a { text-decoration:none; }
-  h1 { font-size: 26px; margin: 10px 0 4px; } h2 { font-size: 19px; margin: 22px 0 6px; }
-  .sub { color: var(--muted); margin: 0 0 8px; }
-  .progress { height: 10px; background: var(--line); border-radius: 6px; overflow: hidden; margin: 8px 0 2px; }
-  .progress div { height: 100%; background: var(--ok); width: 0; transition: width .3s; }
-  ul { list-style: none; padding: 0; margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
-  li { border-top: 1px solid var(--line); } li:first-child { border-top: 0; }
-  label { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; cursor: pointer; }
-  input[type=checkbox] { width: 22px; height: 22px; margin-top: 2px; flex: none; accent-color: var(--ok); }
+  main { max-width: 780px; }
+  h1 { font: 800 30px/1.05 var(--cond); text-transform: uppercase; margin: 18px 0 6px; }
+  h2 { font: 700 15px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 24px 0 8px; }
+  .sub { color: var(--muted); }
+  .progress { height: 16px; border: 2px solid var(--ink); background: var(--panel); margin: 10px 0 4px; }
+  .progress div { height: 100%; width: 0; background: repeating-linear-gradient(-45deg, var(--olive) 0 8px, #3d4419 8px 16px); transition: width .3s; }
+  #count { font: 600 14px/1.4 var(--mono); text-transform: uppercase; }
+  ul { list-style: none; padding: 0; margin: 0; border: 2px solid var(--ink); background: var(--panel); }
+  li { border-top: 1px solid var(--ink); } li:first-child { border-top: 0; }
+  label { display: flex; gap: 12px; align-items: flex-start; padding: 11px 14px; cursor: pointer; font-weight: 600; }
+  input[type=checkbox] { appearance: none; width: 24px; height: 24px; margin-top: 1px; flex: none; border: 2px solid var(--ink); background: var(--paper); display: grid; place-content: center; cursor: pointer; }
+  input[type=checkbox]:checked { background: var(--olive); }
+  input[type=checkbox]:checked::after { content: "✓"; color: #f6f2e6; font: 800 17px/1 var(--font); }
   li.done span { color: var(--muted); text-decoration: line-through; }
-  .src { color: var(--muted); font-size: 14px; margin-top: 6px; }
-  button { font: inherit; font-size: 15px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--fg); cursor: pointer; }
-  @media print { .bar, button { display: none; } body { background: #fff; color: #000; } ul { border: 0; } }
+  .src { color: var(--muted); font: 500 12px/1.5 var(--mono); margin-top: 8px; }
+  @media print { .bar, button, .topbar, .hazard { display: none; } body { background: #fff; } }
 </style>
 </head>
+<header class="topbar"><div class="wrap">
+  <a class="back" href="/">← Krislåda</a>
+  <span class="logo" style="font-size:26px">Checklista</span>
+  <div class="meta">Hemberedskap<br>en vecka</div>
+</div></header>
+<div class="hazard"></div>
 <body>
 <main>
-  <div class="bar"><a href="../">← Krislåda</a><a href="#" onclick="print(); return false">🖨 Skriv ut</a></div>
   <h1>Checklista för hemberedskap</h1>
   <p class="sub">Bocka av det du har hemma. Målet är att klara dig själv i minst en vecka. Bockarna sparas i den här webbläsaren.</p>
   <div class="progress"><div id="bar"></div></div>
@@ -44,7 +47,7 @@
   <h2>Krislådan</h2>
   <ul id="kit"></ul>
 
-  <p style="margin-top:18px"><button id="reset">Börja om</button></p>
+  <p style="margin:18px 0 30px; display:flex; gap:8px"><button class="btn ghost" onclick="print()">Skriv ut</button><button class="btn ghost" id="reset">Börja om</button></p>
 </main>
 <script src="../lib/md.js"></script>
 <script>
@@ -59,7 +62,7 @@
     'Organic Maps med Sverige, och Kiwix med de medicinska biblioteken, på mobilen',
     'Batteri- eller vevradio, inställd på Sveriges Radio P4',
     'Laddad powerbank eller batteripaket som räcker till Macen',
-    'USB GPS-mottagare till datorn (och en USB-C-adapter om datorn bara har USB-C), testad med 📍 på kartan',
+    'USB GPS-mottagare till datorn (och en USB-C-adapter om datorn bara har USB-C), testad med Var är jag? på kartan',
     'Familjen vet hur man öppnar Krislådan från mobilen (samma wifi)',
   ];
   function list(el, items) {

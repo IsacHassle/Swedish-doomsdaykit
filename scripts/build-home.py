@@ -88,7 +88,7 @@ BOOKS = [
 
 # Library groups: (heading, [(book name prefix, short Swedish description)])
 GROUPS = [
-    ("Sjukvård · Medical", [
+    ("Sjukvård", [
         ("wikipedia_en_medicine", "Alla medicinska Wikipedia-artiklar, med bilder"),
         ("mdwiki_en", "Granskat medicinskt uppslagsverk"),
         ("zimgit-medicine", "Böcker: akutsjukvård, Where There Is No Doctor"),
@@ -97,7 +97,7 @@ GROUPS = [
         ("nhs.uk_en_medicines", "Läkemedel: vad de är till för, biverkningar"),
         ("wwwnc.cdc.gov", "Smittsamma sjukdomar och utbrott"),
     ]),
-    ("Vatten, mat, skydd · Water, food, shelter", [
+    ("Vatten, mat och skydd", [
         ("zimgit-water", "Rena vatten: koka, filtrera, kemiskt"),
         ("zimgit-food-preparation", "Förvara och laga mat utan el"),
         ("zimgit-post-disaster", "Skydd, sanitet, återuppbyggnad"),
@@ -110,13 +110,13 @@ GROUPS = [
         ("outdoors.stackexchange", "Friluftsliv, skydd, värme"),
         ("zimgit-knots", "Knopar och surrningar"),
     ]),
-    ("Laga och kommunicera · Repair and radio", [
+    ("Laga och kommunicera", [
         ("ifixit", "Reparationsguider för allt"),
         ("mechanics.stackexchange", "Bilreparationer"),
         ("diy.stackexchange", "Hus: värme, vatten, el"),
         ("ham.stackexchange", "Amatörradio och nödkommunikation"),
     ]),
-    ("Allmän kunskap · General knowledge", [
+    ("Allmän kunskap", [
         ("wikipedia_sv_all", "Svenska Wikipedia, med bilder"),
         ("wikipedia_en_all", "English Wikipedia, text only"),
     ]),
@@ -126,6 +126,7 @@ GROUPS = [
 ADVICE_ORDER = ["1177", "MCF", "Livsmedelsverket", "Krisinformation"]
 ADVICE_NAMES = {"1177": "1177 · Första hjälpen och skador", "MCF": "MCF · Hemberedskap, varningar, skyddsrum, brand",
                 "Livsmedelsverket": "Livsmedelsverket · Vatten och mat", "Krisinformation": "Krisinformation.se"}
+ADVICE_COUNT = 0
 
 
 def swedish_page(stem):
@@ -183,15 +184,16 @@ def main():
             src, title = name[:-3].split(" - ", 1)
             advice.setdefault(src, []).append((title, swedish_page(name[:-3])))
     advice_html = "".join(
-        f'<h3>{html.escape(ADVICE_NAMES.get(src, src))}</h3><div class="chips">'
-        + "".join(f'<a class="chip" href="{href}"><b>{html.escape(t)}</b></a>' for t, href in items) + "</div>"
+        f'<h3 class="sub">{html.escape(ADVICE_NAMES.get(src, src))}</h3><div class="tabs plain">'
+        + "".join(f'<a class="tab" href="{href}"><b>{html.escape(t)}</b></a>' for t, href in items) + "</div>"
         for src, items in sorted(advice.items(), key=lambda kv: ADVICE_ORDER.index(kv[0]) if kv[0] in ADVICE_ORDER else 99))
 
     books_html = []
     for label, desc, rel in BOOKS:
         if os.path.exists(os.path.join(DOCS, rel)):
             href = "docs/" + "/".join(urllib.request.quote(p) for p in rel.split("/"))
-            books_html.append(f'<a class="card" href="{href}"><b>{html.escape(label)}</b><span>{html.escape(desc)}</span></a>')
+            books_html.append(f'<a class="tile" href="{href}"><span class="k">PDF · bok {len(books_html) + 1:02d}</span>'
+                              f'<b>{html.escape(label)}</b><span class="d">{html.escape(desc)}</span></a>')
 
     groups_html = []
     shown = set()
@@ -202,19 +204,21 @@ def main():
             if not b:
                 continue
             shown.add(b["name"])
-            cards.append(f'<a class="card" data-k="/viewer#{b["name"]}"><b>{html.escape(b["title"])}</b><span>{html.escape(desc)}</span></a>')
+            cards.append(f'<a class="tile" data-k="/viewer#{b["name"]}"><span class="k">Bibliotek</span>'
+                         f'<b>{html.escape(b["title"])}</b><span class="d">{html.escape(desc)}</span></a>')
         if cards:
-            groups_html.append(f'<h3>{html.escape(heading)}</h3><div class="grid">{"".join(cards)}</div>')
+            groups_html.append(f'<h3 class="sub">{html.escape(heading)}</h3><div class="tiles">{"".join(cards)}</div>')
     extra = [b for b in books if b["name"] not in shown]
     if extra:
-        cards = "".join(f'<a class="card" data-k="/viewer#{b["name"]}"><b>{html.escape(b["title"])}</b><span>{html.escape(b["name"])}</span></a>' for b in extra)
-        groups_html.append(f'<h3>Övrigt · Other</h3><div class="grid">{cards}</div>')
+        cards = "".join(f'<a class="tile" data-k="/viewer#{b["name"]}"><span class="k">Bibliotek</span><b>{html.escape(b["title"])}</b>'
+                        f'<span class="d">{html.escape(b["name"])}</span></a>' for b in extra)
+        groups_html.append(f'<h3 class="sub">Övrigt</h3><div class="tiles">{cards}</div>')
 
     emergency_html = "".join(
-        (f'<div class="chip"><a class="main" href="{sv_href}"><b>{html.escape(sv)}</b><span>{html.escape(sv_src)} · på svenska</span></a>'
-         f'<a class="en" data-k="{html.escape(k)}">{html.escape(en)} (engelska)</a></div>')
+        (f'<div class="tab"><a class="main" href="{sv_href}"><b>{html.escape(sv)}</b><span class="src">{html.escape(sv_src)}</span></a>'
+         f'<a class="en" data-k="{html.escape(k)}">På engelska: {html.escape(en)}</a></div>')
         if sv_href else
-        f'<a class="chip" data-k="{html.escape(k)}"><b>{html.escape(sv)}</b><span>{html.escape(en)}</span></a>'
+        f'<a class="tab" data-k="{html.escape(k)}"><b>{html.escape(sv)}</b><span class="src">WikiMed · engelska</span></a>'
         for sv, en, k, (sv_href, sv_src) in emergency)
 
     page = TEMPLATE
@@ -244,99 +248,69 @@ TEMPLATE = r"""<!doctype html>
 <link rel="apple-touch-icon" href="/icon-180.png">
 <meta name="apple-mobile-web-app-title" content="Krislåda">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0b5cad">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%E2%9B%91%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#161512">
+<link rel="icon" href="/icon-180.png">
+<link rel="stylesheet" href="lib/kit.css">
 <style>
-  :root { --bg:#f6f5f2; --fg:#1d1d1f; --muted:#5f5f66; --card:#ffffff; --line:#e3e1dc; --accent:#0b5cad; --fill:#0b5cad; --red:#b3261e; --redbg:#fdecea; }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg:#141416; --fg:#f2f2f4; --muted:#a3a3ab; --card:#1f1f23; --line:#2e2e34; --accent:#6aa9ff; --fill:#1f5fae; --red:#ff8a80; --redbg:#3a1d1b; }
-  }
-  * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.45 -apple-system, system-ui, "Segoe UI", sans-serif; }
-  main { max-width: 1100px; margin: 0 auto; padding: 16px; }
-  h1 { font-size: 26px; margin: 4px 0 2px; }
-  h2 { font-size: 19px; margin: 28px 0 10px; }
-  h3 { font-size: 15px; margin: 20px 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
-  .sub { color: var(--muted); margin: 0 0 14px; }
-  .alert { background: var(--redbg); border: 1px solid var(--red); border-radius: 12px; padding: 12px 14px; }
-  .alert b { color: var(--red); }
-  .nums { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 6px; }
-  .nums span { white-space: nowrap; }
-  form.search { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
-  form.search input { flex: 1 1 260px; font-size: 18px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--fg); }
-  form.search button { font-size: 16px; padding: 12px 16px; border-radius: 10px; border: 0; background: var(--fill); color: #fff; cursor: pointer; }
-  form.search button.alt { background: var(--card); color: var(--fg); border: 1px solid var(--line); }
-  .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 8px; }
-  .chip, .card { display: block; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; color: var(--fg); text-decoration: none; cursor: pointer; }
-  .chip:hover, .card:hover { border-color: var(--accent); }
-  .chip b, .card b { display: block; }
-  div.chip { padding: 0; display: flex; flex-direction: column; }
-  div.chip a.main { color: var(--fg); text-decoration: none; padding: 10px 12px 4px; flex: 1; }
-  div.chip a.en { font-size: 13px; color: var(--muted); padding: 0 12px 8px; text-decoration: underline; }
-  div.chip a.main span { color: var(--muted); font-size: 14px; display: block; }
-  .chip span, .card span { display: block; color: var(--muted); font-size: 14px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
-  .big { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
-  .big a { background: var(--fill); color: #fff; border: 0; }
-  .big a span { color: #e8f0ff; }
-  .big.top { margin-top: 14px; }
-  .big.top a b { font-size: 18px; }
-  footer { color: var(--muted); font-size: 14px; margin: 32px 0 12px; }
+  form.search { display: flex; gap: 8px; flex-wrap: wrap; }
+  form.search input { flex: 1 1 280px; }
 </style>
 </head>
 <body>
-<main>
-  <h1>Krislåda</h1>
-  <p class="sub">Allt här fungerar utan internet. %COUNT% bibliotek, karta och böcker. · Everything here works offline.</p>
+<header class="topbar"><div class="wrap">
+  <a class="logo" href="./">Krislåda<small>SVERIGE · OFFLINE</small></a>
+  <div class="meta"><span id="clock"></span><br>%COUNT% bibliotek · karta · AI</div>
+</div></header>
+<div class="hazard"></div>
 
-  <div class="alert">
-    <b>Livsfara? Ring 112</b> om någon telefon fungerar, även utan SIM-kort.
-    <div class="nums">
-      <span><b>112</b> nödsituation</span>
-      <span><b>1177</b> sjukvårdsrådgivning</span>
-      <span><b>113 13</b> information vid kris</span>
-      <span><b>114 14</b> polis, ej akut</span>
-      <span>Radio: <b>Sveriges Radio P4</b></span>
+<main>
+  <div class="danger">
+    <div class="body">
+      <div class="call">Livsfara? <b>Ring 112</b></div>
+      <div class="nums">
+        <span><b>112</b>nödsituation</span>
+        <span><b>1177</b>sjukvårdsråd</span>
+        <span><b>113&nbsp;13</b>information vid kris</span>
+        <span><b>114&nbsp;14</b>polisen, ej akut</span>
+        <span>Radio: <b>P4</b></span>
+      </div>
     </div>
   </div>
+  <div class="warn" id="battery" hidden></div>
 
-  <div class="alert" id="battery" style="display:none; margin-top:10px"></div>
+  <div class="sec"><span class="num">01</span><h2>Akut</h2><span class="hint">Första hjälpen, steg för steg</span></div>
+  <div class="tabs">%EMERGENCY%</div>
 
-  <form class="search" id="search">
-    <input id="q" placeholder="Sök i alla bibliotek, t.ex. hypothermia, water purification" autocomplete="off" aria-label="Sök">
-    <button type="submit">Sök (engelska)</button>
-    <button type="button" class="alt" id="sv">Sök på svenska</button>
-  </form>
-  <p class="sub" style="margin-top:6px">De flesta böcker är på engelska: sök med engelska ord. Eller fråga AI:n på svenska, den läser böckerna åt dig.</p>
-
-  <div class="big top">
-    <a class="card" href="ai/"><b>🤖 Fråga AI · Ask the AI</b><span>Skriv eller prata på svenska. Svarar ur böckerna och visar källan, kan titta på foton. Guide på sidan.</span></a>
-    <a class="card" href="map/"><b>🗺 Karta · Map</b><span>Sök gata och adress, hitta närmaste sjukhus, apotek och dricksvatten.</span></a>
-    <a class="card" href="map/?gps=1"><b>📍 Var är jag? · Where am I</b><span>Din position på kartan med en USB GPS-mottagare i datorn, utan internet.</span></a>
-    <a class="card" href="skriv-ut/"><b>🖨 Skriv ut · Print</b><span>Första hjälpen, varningar, vatten och värme på papper. Gör det nu, medan det finns ström.</span></a>
-    <a class="card" href="checklista/"><b>✅ Checklista · Checklist</b><span>Har du det du behöver för en vecka? MCF:s lista att bocka av.</span></a>
+  <div class="sec"><span class="num">02</span><h2>Verktyg</h2></div>
+  <div class="tiles tools">
+    <a class="tile go" href="ai/"><span class="k">AI · offline</span><b>Fråga AI</b><span class="d">Skriv eller prata på svenska. Svarar ur böckerna och visar källan.</span></a>
+    <a class="tile" href="map/"><span class="k">Karta · hela Sverige</span><b>Karta</b><span class="d">Sök ort, gata och adress. Närmaste sjukhus, apotek och vatten.</span></a>
+    <a class="tile olive" href="map/?gps=1"><span class="k">GPS</span><b>Var är jag?</b><span class="d">Din position på kartan, med USB GPS-mottagare eller mobilen.</span></a>
+    <a class="tile" href="skriv-ut/"><span class="k">Papper</span><b>Skriv ut</b><span class="d">Första hjälpen, varningar, vatten och värme. Gör det nu.</span></a>
+    <a class="tile" href="checklista/"><span class="k">Hemberedskap</span><b>Checklista</b><span class="d">Har du det du behöver för en vecka?</span></a>
   </div>
 
-  <h2>Akut · Emergency</h2>
-  <div class="chips">%EMERGENCY%</div>
+  <div class="sec"><span class="num">03</span><h2>Sök i biblioteken</h2></div>
+  <form class="search" id="search">
+    <input type="search" id="q" placeholder="t.ex. hypothermia, water purification, kantarell" autocomplete="off" aria-label="Sök i biblioteken">
+    <button type="submit" class="btn go">Sök (engelska)</button>
+    <button type="button" class="btn ghost" id="sv">Sök på svenska</button>
+  </form>
+  <p class="lead" style="margin-top:8px">De flesta böcker är på engelska, så sök med engelska ord. Eller fråga AI:n på svenska.</p>
 
-  <h2>Svenska myndigheters råd · Swedish authorities' advice</h2>
-  <p class="sub">Sparade från 1177, MCF, Livsmedelsverket och Krisinformation, så att de går att läsa utan internet.</p>
+  <div class="sec"><span class="num">04</span><h2>Myndigheternas råd</h2><span class="hint">1177 · MCF · Livsmedelsverket, sparade för läsning utan internet</span></div>
   %ADVICE%
 
-  <h2>Viktigaste böckerna · Key books</h2>
-  <div class="grid">%BOOKS%</div>
-
-  <h2>Karta och dokument · Map and documents</h2>
-  <div class="big">
-    <a class="card" href="map/"><b>Karta över Sverige</b><span>Zooma in till enskilda hus. Sök adress, tryck för koordinater</span></a>
-    <a class="card" href="docs/"><b>Alla dokument</b><span>Broschyrer och hela boksamlingen som PDF</span></a>
+  <div class="sec"><span class="num">05</span><h2>Böcker</h2><span class="hint">De viktigaste, som PDF</span></div>
+  <div class="tiles">%BOOKS%
+    <a class="tile" href="docs/"><span class="k">Alla filer</span><b>Alla dokument</b><span class="d">Broschyrer och hela boksamlingen</span></a>
   </div>
 
-  <h2>Alla bibliotek · All libraries</h2>
+  <div class="sec"><span class="num">06</span><h2>Alla bibliotek</h2></div>
   %GROUPS%
 
-  <footer>Krislåda · Swedish-doomsdaykit · Starta: Starta Krislåda.command · Bibliotek från Kiwix, karta © OpenStreetMap</footer>
+  <footer class="kit">KRISLÅDA · Swedish-doomsdaykit · Starta: Starta Krislåda.command · Kontrollera en gång i månaden: Kontrollera Krislåda.command<br>
+  Bibliotek från Kiwix · Karta © OpenStreetMap · Råd från 1177, MCF och Livsmedelsverket</footer>
 </main>
 <script>
   const KIWIX = 'http://' + (location.hostname || 'localhost') + ':8090';   // the libraries are always plain http
@@ -349,13 +323,15 @@ TEMPLATE = r"""<!doctype html>
   };
   document.getElementById('search').addEventListener('submit', e => { e.preventDefault(); go(ENG); });
   document.getElementById('sv').addEventListener('click', () => go(SWE.length ? SWE : ENG));
+  const clock = () => { document.getElementById('clock').textContent = new Date().toLocaleString('sv-SE', { dateStyle: 'medium', timeStyle: 'short' }); };
+  clock(); setInterval(clock, 30000);
   // On battery: say so, with what saves power.
   const battery = () => fetch('/ai-api/status').then(r => r.json()).then(s => {
     const b = s.battery, el = document.getElementById('battery');
     if (b && b.on_battery) {
-      el.style.display = 'block';
-      el.innerHTML = `<b>🔋 Macen går på batteri: ${b.percent}%.</b> Spara ström: sänk skärmens ljusstyrka, stäng andra appar, välj <b>🔋 Spara batteri</b> i AI:n och ställ få frågor.`;
-    } else el.style.display = 'none';
+      el.hidden = false;
+      el.innerHTML = `Macen går på batteri: ${b.percent} %. Spara ström: sänk ljusstyrkan, stäng andra appar, välj <b>Spara batteri</b> i AI:n och ställ få frågor.`;
+    } else el.hidden = true;
   }).catch(() => {});
   battery(); setInterval(battery, 60000);
 </script>

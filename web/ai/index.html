@@ -9,104 +9,80 @@
 <meta name="apple-mobile-web-app-title" content="Krislåda">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0b5cad">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%E2%9B%91%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="/icon-180.png">
+<link rel="stylesheet" href="../lib/kit.css">
 <style>
-  :root { --bg:#f6f5f2; --fg:#1d1d1f; --muted:#5f5f66; --card:#ffffff; --line:#e3e1dc; --accent:#0b5cad; --fill:#0b5cad; --accentbg:#e8f0fb; --red:#b3261e; --redbg:#fdecea; --ok:#1e7a3c; --warn:#9a5b00; }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg:#141416; --fg:#f2f2f4; --muted:#a3a3ab; --card:#1f1f23; --line:#2e2e34; --accent:#6aa9ff; --fill:#1f5fae; --accentbg:#1c2a3d; --red:#ff8a80; --redbg:#3a1d1b; --ok:#6fd08c; --warn:#f0b35a; }
-  }
-  * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 -apple-system, system-ui, "Segoe UI", sans-serif; }
-  main { max-width: 860px; margin: 0 auto; padding: 16px; }
-  a { color: var(--accent); }
-  .top { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
-  .top a { text-decoration:none; }
-  h1 { font-size: 26px; margin: 4px 0 2px; }
-  h2 { font-size: 19px; margin: 28px 0 10px; }
-  h3 { font-size: 16px; margin: 18px 0 6px; }
-  .sub { color: var(--muted); margin: 0 0 12px; }
-  .alert { background: var(--redbg); border: 1px solid var(--red); border-radius: 12px; padding: 10px 14px; margin: 10px 0; }
-  .alert b { color: var(--red); }
-  #status { display:flex; flex-wrap:wrap; gap:6px 16px; font-size:14px; color:var(--muted); margin: 8px 0 4px; }
-  #status .ok { color: var(--ok); } #status .bad { color: var(--warn); }
-  #fix { font-size: 14px; color: var(--warn); margin: 2px 0 8px; }
-
-  .modes { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:8px; margin: 10px 0 14px; }
-  .mode { position:relative; display:block; background:var(--card); border:2px solid var(--line); border-radius:12px; padding:10px 12px; cursor:pointer; }
-  .mode input { position:absolute; opacity:0; pointer-events:none; }
-  .mode b { display:block; } .mode span { display:block; font-size:14px; color:var(--muted); }
-  .mode:has(input:checked) { border-color: var(--accent); background: var(--accentbg); }
-  .mode:has(input:disabled) { opacity: .45; cursor: not-allowed; }
-  .mode:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-  #log { display:flex; flex-direction:column; gap:10px; margin-bottom: 12px; }
-  .msg { scroll-margin-top: 12px; border-radius:12px; padding:10px 14px; max-width: 100%; overflow-wrap: anywhere; }
-  .me { align-self:flex-end; background: var(--accentbg); border:1px solid var(--line); max-width: 85%; white-space: pre-wrap; }
-  .me img { display:block; max-width: 220px; max-height: 220px; border-radius: 8px; margin-top: 6px; }
-  .ai { background: var(--card); border:1px solid var(--line); }
-  .ai p, .ai ul, .ai ol { margin: 6px 0; } .ai ul, .ai ol { padding-left: 22px; }
-  .ai h4 { margin: 10px 0 4px; font-size: 16px; }
-  .ai table { border-collapse: collapse; margin: 8px 0; font-size: 14px; display:block; overflow-x:auto; }
-  .ai td, .ai th { border:1px solid var(--line); padding: 4px 8px; text-align:left; vertical-align: top; }
-  .ai code { font-size: 14px; }
-  .meta { font-size: 13px; color: var(--muted); margin-top: 6px; }
-  .wait { color: var(--muted); font-style: italic; }
-  .src { font-size: 14px; margin-top: 8px; border-top: 1px solid var(--line); padding-top: 6px; }
-  .src a, .src span { display:inline-block; margin: 2px 10px 2px 0; }
-  .sep { text-align:center; font-size: 13px; color: var(--muted); }
-  .err { color: var(--red); }
-
-  form#ask { position: sticky; bottom: 0; background: var(--bg); padding: 8px 0 10px; border-top: 1px solid var(--line); }
-  textarea { width:100%; font: inherit; font-size: 17px; padding: 10px 12px; border-radius: 10px; border:1px solid var(--line); background: var(--card); color: var(--fg); resize: vertical; min-height: 64px; }
-  .row { display:flex; gap:8px; margin-top: 8px; flex-wrap: wrap; align-items:center; }
+  main { max-width: 900px; }
+  .modes { display: grid; grid-template-columns: repeat(3, 1fr); border: 2px solid var(--ink); margin: 14px 0 16px; }
+  .mode { position: relative; display: block; padding: 10px 12px; cursor: pointer; background: var(--panel); border-right: 2px solid var(--ink); }
+  .mode:last-child { border-right: 0; }
+  .mode input { position: absolute; opacity: 0; pointer-events: none; }
+  .mode b { display: block; font: 800 20px/1.05 var(--cond); text-transform: uppercase; }
+  .mode span { display: block; margin-top: 4px; font: 500 14px/1.35 var(--font); color: var(--muted); }
+  .mode .k { font: 600 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+  .mode:has(input:checked) { background: var(--ink); color: var(--paper); }
+  .mode:has(input:checked) span, .mode:has(input:checked) .k { color: #c9c2ac; }
+  .mode:has(input:disabled) { opacity: .4; cursor: not-allowed; }
+  .mode:has(input:focus-visible) { outline: 3px solid var(--orange); outline-offset: -3px; }
+  #status { margin: 10px 0 2px; }
+  #fix { font-weight: 600; color: var(--red); margin: 4px 0; }
+  #log { display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
+  .msg { scroll-margin-top: 12px; overflow-wrap: anywhere; }
+  .me { align-self: flex-end; max-width: 85%; white-space: pre-wrap; background: var(--ink); color: var(--paper); padding: 10px 14px; font-weight: 600; }
+  .me img { display: block; max-width: 220px; max-height: 220px; margin-top: 8px; border: 2px solid var(--paper); }
+  .ai { background: var(--panel); border: 2px solid var(--ink); border-left: 8px solid var(--orange); padding: 10px 16px; }
+  .ai p, .ai ul, .ai ol { margin: 6px 0; } .ai ul, .ai ol { padding-left: 22px; } .ai li { margin: 3px 0; }
+  .ai h4 { margin: 12px 0 4px; font: 800 19px/1.1 var(--cond); text-transform: uppercase; }
+  .ai table { border-collapse: collapse; margin: 8px 0; font-size: 15px; display: block; overflow-x: auto; }
+  .ai td, .ai th { border: 1px solid var(--ink); padding: 4px 8px; text-align: left; vertical-align: top; }
+  .meta { font: 600 12px/1.4 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
+  .wait { font: 600 14px/1.4 var(--mono); text-transform: uppercase; color: var(--muted); }
+  .src { margin-top: 8px; padding-top: 8px; border-top: 2px dashed var(--ink); font: 600 13px/1.6 var(--mono); }
+  .src a, .src span { display: inline-block; margin-right: 14px; }
+  .sep { font: 600 12px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); text-align: center; }
+  .err { color: var(--red); font-weight: 700; }
+  form#ask { position: sticky; bottom: 0; background: var(--paper); padding: 10px 0 12px; border-top: 3px solid var(--ink); }
+  textarea { width: 100%; resize: vertical; min-height: 70px; font-size: 18px; }
+  .row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
   .row .grow { flex: 1; }
-  button, .btn { font: inherit; font-size: 16px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--fg); cursor: pointer; }
-  button.primary { background: var(--fill); color: #fff; border: 0; min-width: 110px; }
-  button.stop { background: var(--red); color:#fff; border:0; min-width: 110px; }
-  .btn input { display:none; }
-  #thumbs { display:flex; gap:6px; flex-wrap:wrap; }
-  #thumbs div { position:relative; } #thumbs img { width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid var(--line); }
-  #thumbs button { position:absolute; top:-6px; right:-6px; padding:0 6px; font-size:13px; border-radius: 10px; }
-
-  .chips { display:flex; flex-wrap:wrap; gap:6px; margin: 4px 0 12px; }
-  .chips button { font-size: 14px; padding: 6px 10px; text-align:left; }
-
-  details.guide { background: var(--card); border:1px solid var(--line); border-radius:12px; padding: 4px 14px 10px; }
-  details.guide summary { cursor:pointer; font-weight:600; font-size: 17px; padding: 8px 0; }
-  .guide ol > li { margin: 8px 0; }
-  .guide table { border-collapse: collapse; width:100%; font-size: 15px; margin: 6px 0; }
-  .guide td, .guide th { border:1px solid var(--line); padding: 6px 8px; text-align:left; vertical-align: top; }
-  .example { background: var(--accentbg); border-radius: 8px; padding: 8px 10px; font-size: 15px; }
-  footer { color: var(--muted); font-size: 14px; margin: 24px 0 12px; }
-  @media (max-width: 520px) {
-    main { padding: 12px; }
-    h1 { font-size: 22px; }
-    .modes { grid-template-columns: repeat(3, 1fr); gap: 6px; }
-    .mode { padding: 8px 6px; text-align: center; font-size: 14px; }
-    .mode span { display: none; }
-    textarea { min-height: 48px; font-size: 16px; }
-    .row { flex-wrap: nowrap; }
-    button, .btn { padding: 9px 11px; font-size: 15px; }
-    button.primary, button.stop { min-width: 0; }
-    .long { display: none; }
+  .btn input { display: none; }
+  .btn.stop { background: var(--red); border-color: var(--red); color: #fff; }
+  #thumbs { display: flex; gap: 6px; flex-wrap: wrap; }
+  #thumbs div { position: relative; } #thumbs img { width: 64px; height: 64px; object-fit: cover; border: 2px solid var(--ink); }
+  #thumbs button { position: absolute; top: -8px; right: -8px; font: 700 13px/1 var(--mono); padding: 3px 6px; background: var(--ink); color: var(--paper); border: 0; cursor: pointer; }
+  #examples { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+  #examples button { text-align: left; font: 600 15px/1.35 var(--font); color: var(--ink); background: var(--panel); border: 2px solid var(--ink); border-left: 6px solid var(--olive); padding: 9px 11px; cursor: pointer; }
+  #examples button:hover { background: var(--paper); }
+  .guide ol > li { margin: 10px 0; }
+  .guide table { border-collapse: collapse; width: 100%; font-size: 15px; margin: 8px 0; }
+  .guide td, .guide th { border: 2px solid var(--ink); padding: 6px 8px; text-align: left; vertical-align: top; background: var(--panel); }
+  .guide th { background: var(--ink); color: var(--paper); font: 700 14px/1.2 var(--mono); text-transform: uppercase; }
+  .example { background: var(--panel); border: 2px dashed var(--ink); padding: 8px 10px; font-size: 15px; margin-top: 6px; }
+  details.guide summary { cursor: pointer; font: 700 15px/1 var(--mono); text-transform: uppercase; letter-spacing: .05em; padding: 6px 0; }
+  @media (max-width: 560px) {
+    .modes { grid-template-columns: repeat(3, 1fr); }
+    .mode { padding: 8px 6px; text-align: center; } .mode span, .mode .k { display: none; } .mode b { font-size: 16px; }
+    .long { display: none; } .btn { padding: 11px 12px; font-size: 15px; }
   }
 </style>
 </head>
 <body>
+<header class="topbar"><div class="wrap">
+  <a class="back" href="../">← Krislåda</a>
+  <span class="logo" style="font-size:26px">Fråga AI</span>
+  <div class="meta">Körs på den här Macen<br>utan internet</div>
+</div></header>
+<div class="hazard"></div>
 <main>
-  <div class="top"><a href="../">← Krislåda</a></div>
-  <h1>Fråga AI · Ask the AI</h1>
-  <p class="sub">AI:n körs helt på den här Macen, utan internet. Skriv på svenska eller engelska. · Runs on this Mac, offline.</p>
+  <div class="warn" style="border-left-color: var(--red)"><b>Livsfara? Ring 112.</b> Vänta inte på AI:n vid andningsstopp eller kraftig blödning: öppna <a href="../">Akut</a> på startsidan. AI kan ha fel, kontrollera i källan.</div>
 
-  <div class="alert"><b>Livsfara? Ring 112</b> om någon telefon fungerar. Vänta inte på AI:n vid andningsstopp eller kraftig blödning: öppna <a href="../">Akut-knapparna</a>. AI kan ha fel, kontrollera i källan.</div>
-
-  <div id="status">Kontrollerar AI:n…</div>
+  <div id="status" class="lamps">Kontrollerar AI:n…</div>
   <div id="fix"></div>
 
   <div class="modes" role="radiogroup" aria-label="Välj läge">
-    <label class="mode"><input type="radio" name="mode" value="books"><b>📚 Svar ur böckerna</b><span>Söker i kitets böcker och visar källan. Bäst för det mesta. Ca 10 till 40 s.</span></label>
-    <label class="mode"><input type="radio" name="mode" value="crisis"><b>⚡ Snabbt svar</b><span>Samma stora AI, utan böckerna. Kan titta på foton. Ca 5 till 20 s.</span></label>
-    <label class="mode"><input type="radio" name="mode" value="crisis-small"><b>🔋 Spara batteri</b><span>Mindre AI som drar mindre ström. Enklare svar. Kan också titta på foton.</span></label>
+    <label class="mode"><input type="radio" name="mode" value="books"><span class="k">Läge A · 10–40 s</span><b>Ur böckerna</b><span>Söker i krislådans böcker och visar källan. Bäst för det mesta.</span></label>
+    <label class="mode"><input type="radio" name="mode" value="crisis"><span class="k">Läge B · 5–20 s</span><b>Snabbt svar</b><span>Samma stora AI, utan böckerna. Kan titta på foton.</span></label>
+    <label class="mode"><input type="radio" name="mode" value="crisis-small"><span class="k">Läge C · lite ström</span><b>Spara batteri</b><span>Mindre AI som drar mindre ström. Enklare svar, tar foton.</span></label>
   </div>
 
   <div id="log" aria-live="polite"></div>
@@ -115,15 +91,15 @@
     <div id="thumbs"></div>
     <textarea id="q" rows="3" placeholder="Beskriv läget: vem (ålder), vad hände, när, vad du ser och vad du har hemma." aria-label="Din fråga"></textarea>
     <div class="row">
-      <label class="btn" title="Bifoga foto (Snabbt svar eller Spara batteri)">📷 Foto<input id="photo" type="file" accept="image/*" multiple></label>
-      <button type="button" id="new">Ny<span class="long"> konversation</span></button>
+      <label class="btn ghost" title="Bifoga foto (Snabbt svar eller Spara batteri)">Foto<input id="photo" type="file" accept="image/*" multiple></label>
+      <button type="button" class="btn ghost" id="new">Ny<span class="long"> konversation</span></button>
       <span class="grow"></span>
-      <button type="submit" id="send" class="primary">Skicka</button>
+      <button type="submit" id="send" class="btn go">Skicka</button>
     </div>
   </form>
 
-  <h2>Prova att fråga · Try asking</h2>
-  <div class="chips" id="examples">
+  <div class="sec"><span class="num">01</span><h2>Prova att fråga</h2></div>
+  <div id="examples">
     <button type="button">Någon har bränt handen på spisen. Vad gör jag nu?</button>
     <button type="button">Hur renar jag vatten om kranvattnet inte går att dricka?</button>
     <button type="button">Ett barn på 4 år har haft 39,5 graders feber i två dagar. När måste vi söka vård?</button>
@@ -131,19 +107,19 @@
     <button type="button">Vad betyder signalen Viktigt meddelande till allmänheten och vad ska jag göra när jag hör den?</button>
     <button type="button">Vad behöver vi hemma för att klara en vecka utan el och vatten? Vi är två vuxna och ett barn.</button>
     <button type="button">Hur lagar jag mat säkert utan el?</button>
-    <button type="button" data-photo="1">📷 Vad är det här? Bifoga ett foto av ett sår, utslag, en växt eller en trasig sak</button>
+    <button type="button" data-photo="1">Vad är det här? Bifoga ett foto av ett sår, utslag, en växt eller en trasig sak</button>
   </div>
 
-  <h2>Guide</h2>
+  <div class="sec"><span class="num">02</span><h2>Så använder du AI:n</h2></div>
   <details class="guide" open>
-    <summary>Så använder du AI:n · How to use the AI</summary>
+    <summary>Visa eller dölj guiden</summary>
     <ol>
       <li><b>Välj läge.</b>
         <table>
           <tr><th>Läge</th><th>Använd när</th></tr>
-          <tr><td>📚 Svar ur böckerna</td><td>Det mesta: skador, sjukdom, läkemedel, vatten, mat, värme, vad myndigheterna råder. Svaret bygger på kitets böcker (sjukvårdsböcker, NHS läkemedelsfakta, vattenrening, matlagning, MSB-broschyren, Ready.gov om strålning, kemolyckor och elavbrott) och du ser vilka böcker under svaret. Kräver att appen AnythingLLM är igång.</td></tr>
-          <tr><td>⚡ Snabbt svar</td><td>När det är bråttom, eller när du vill visa ett <b>foto</b>. Samma stora AI-modell, men den läser inte i böckerna.</td></tr>
-          <tr><td>🔋 Spara batteri</td><td>När Macen går på batteri och du inte vet när du kan ladda. Mindre modell, enklare svar.</td></tr>
+          <tr><td><b>A · Ur böckerna</b></td><td>Det mesta: skador, sjukdom, läkemedel, vatten, mat, värme, vad myndigheterna råder. Svaret bygger på kitets böcker (sjukvårdsböcker, NHS läkemedelsfakta, vattenrening, matlagning, MSB-broschyren, Ready.gov om strålning, kemolyckor och elavbrott) och du ser vilka böcker under svaret. Kräver att appen AnythingLLM är igång.</td></tr>
+          <tr><td><b>B · Snabbt svar</b></td><td>När det är bråttom, eller när du vill visa ett <b>foto</b>. Samma stora AI-modell, men den läser inte i böckerna.</td></tr>
+          <tr><td><b>C · Spara batteri</b></td><td>När Macen går på batteri och du inte vet när du kan ladda. Mindre modell, enklare svar.</td></tr>
         </table>
       </li>
       <li><b>Skriv som när du ringer 1177.</b> Berätta vem (ålder, vikt för barn), vad som hände, när, vad du ser och vad du har hemma. Ju mer, desto bättre svar.
@@ -151,10 +127,10 @@
       </li>
       <li><b>Fortsätt fråga.</b> AI:n minns samtalet: fråga till exempel <i>Vad gör jag om det blir värre?</i> eller <i>Förklara steg 3 enklare.</i> Tryck <b>Ny konversation</b> när du byter ämne.</li>
       <li><b>Kontrollera viktiga saker.</b> AI kan ha fel. Under svar ur böckerna finns källorna: tryck för att öppna boken. Lita aldrig blint på doser, och ät aldrig en svamp eller växt bara för att AI:n säger att den är ätlig.</li>
-      <li><b>Foto.</b> Tryck 📷 Foto (byter till Snabbt svar). Ta bilden i bra ljus, nära, en sak per bild, och skriv vad du undrar.</li>
+      <li><b>Foto.</b> Tryck <b>Foto</b> (byter till Snabbt svar). Ta bilden i bra ljus, nära, en sak per bild, och skriv vad du undrar.</li>
       <li><b>Prata i stället för att skriva.</b> På Macen: tryck på mikrofontangenten (🎤), eller Fn två gånger, och prata. På mobilen: tryck på mikrofonen på tangentbordet.</li>
       <li><b>Från mobilen.</b> Anslut mobilen till samma wifi som Macen och öppna <b id="lanurl">adressen som Terminal-fönstret visar</b>. Macen gör jobbet, så håll den laddad.</li>
-      <li><b>Spara ström.</b> AI:n drar mycket ström medan den svarar. Ställ få och tydliga frågor, välj 🔋 Spara batteri och stäng andra appar.</li>
+      <li><b>Spara ström.</b> AI:n drar mycket ström medan den svarar. Ställ få och tydliga frågor, välj <b>Spara batteri</b> och stäng andra appar.</li>
       <li><b>Om det inte fungerar.</b> Raden högst upp visar vad som är igång.
         <ul>
           <li>"AI-motorn är inte igång": öppna appen <b>Ollama</b> (i Program) och vänta tio sekunder.</li>
@@ -164,22 +140,22 @@
         </ul>
       </li>
     </ol>
-    <h3>Andra sätt att använda AI:n på Macen</h3>
+    <h3 class="sub">Andra sätt att använda AI:n på Macen</h3>
     <table>
-      <tr><td><b>AnythingLLM</b>-appen, arbetsytan <b>Crisis</b></td><td>Samma böcker som 📚 här. Där finns också dina tidigare samtal, och du kan dra in egna filer (läkemedelslistor, manualer) så att AI:n kan svara ur dem.</td></tr>
-      <tr><td><b>Ollama</b>-appen, modellen <b>crisis</b> eller <b>crisis-small</b></td><td>Samma som ⚡ och 🔋 här. Dra in ett foto i rutan för att fråga om det.</td></tr>
+      <tr><td><b>AnythingLLM</b>-appen, arbetsytan <b>Crisis</b></td><td>Samma böcker som läge A här. Där finns också dina tidigare samtal, och du kan dra in egna filer (läkemedelslistor, manualer) så att AI:n kan svara ur dem.</td></tr>
+      <tr><td><b>Ollama</b>-appen, modellen <b>crisis</b> eller <b>crisis-small</b></td><td>Samma som läge B och C här. Dra in ett foto i rutan för att fråga om det.</td></tr>
       <tr><td>I Terminal</td><td><code>ollama run crisis</code> och skriv din fråga. Avsluta med <code>/bye</code>.</td></tr>
     </table>
   </details>
 
-  <footer>Krislåda · AI-modeller: Gemma 4 26B (crisis), Gemma 4 E4B (crisis-small), sökning i böckerna med AnythingLLM och bge-m3.</footer>
+  <footer class="kit">KRISLÅDA · AI-modeller: Gemma 4 26B (crisis), Gemma 4 E4B (crisis-small) · sökning i böckerna: AnythingLLM och bge-m3</footer>
 </main>
 
 <script>
 (() => {
   const $ = s => document.querySelector(s);
   const log = $('#log'), q = $('#q'), sendBtn = $('#send'), thumbs = $('#thumbs');
-  const LABEL = { 'books': '📚 Svar ur böckerna', 'crisis': '⚡ Snabbt svar', 'crisis-small': '🔋 Spara batteri' };
+  const LABEL = { 'books': 'Ur böckerna', 'crisis': 'Snabbt svar', 'crisis-small': 'Spara batteri' };
   let status = null, mode = null, thread = null, history = [], photos = [], busy = null;
 
   // ---------- status ----------
@@ -189,14 +165,14 @@
     const avail = { 'books': status.books, 'crisis': status.models.includes('crisis'), 'crisis-small': status.models.includes('crisis-small') };
     document.querySelectorAll('input[name=mode]').forEach(i => { i.disabled = !avail[i.value]; });
     const s = [], fix = [];
-    s.push(status.ollama ? '<span class="ok">● AI-motorn (Ollama) är igång</span>' : '<span class="bad">● AI-motorn är inte igång</span>');
-    s.push(status.books ? '<span class="ok">● Böckerna (AnythingLLM) är igång</span>' : '<span class="bad">● Böckerna är inte igång</span>');
+    s.push(status.ollama ? '<span class="lamp">AI-motor: igång</span>' : '<span class="lamp off">AI-motor: av</span>');
+    s.push(status.books ? '<span class="lamp">Böckerna: igång</span>' : '<span class="lamp off">Böckerna: av</span>');
     if (!status.ollama) fix.push('Öppna appen Ollama och vänta tio sekunder.');
     if (!status.books) fix.push('För svar ur böckerna: öppna appen AnythingLLM.');
     const b = status.battery;
     if (b && b.on_battery) {
-      s.push(`<span class="bad">🔋 Macen går på batteri: ${b.percent}%</span>`);
-      if (b.percent < 40 && mode !== 'crisis-small') fix.push('Lite batteri: välj 🔋 Spara batteri, så räcker strömmen längre.');
+      s.push(`<span class="lamp warn">Batteri: ${b.percent} %</span>`);
+      if (b.percent < 40 && mode !== 'crisis-small') fix.push('Lite batteri: välj Spara batteri, så räcker strömmen längre.');
     }
     $('#status').innerHTML = s.join('');
     $('#fix').textContent = fix.join(' ');
@@ -322,7 +298,7 @@
     const paint = () => { const v = visible(raw); if (v) { shown = true; box.innerHTML = md(v); } };
 
     const ctrl = new AbortController();
-    busy = ctrl; sendBtn.textContent = 'Stopp'; sendBtn.className = 'stop';
+    busy = ctrl; sendBtn.textContent = 'Stopp'; sendBtn.className = 'btn stop';
     try {
       if (used === 'books') {
         if (!thread) {
@@ -353,12 +329,12 @@
       }
     } catch (e) {
       if (e.name === 'AbortError') failed = 'stopped';
-      else failed = e.message === 'books' ? 'Böckerna svarar inte. Öppna appen AnythingLLM, vänta tills den startat, och försök igen. Eller välj ⚡ Snabbt svar.'
+      else failed = e.message === 'books' ? 'Böckerna svarar inte. Öppna appen AnythingLLM, vänta tills den startat, och försök igen. Eller välj Snabbt svar.'
                                            : 'AI-motorn svarar inte. Öppna appen Ollama, vänta tio sekunder och försök igen.';
       if (used === 'books' && e.message === 'books') thread = null;
     } finally {
       clearInterval(tick);
-      busy = null; sendBtn.textContent = 'Skicka'; sendBtn.className = 'primary';
+      busy = null; sendBtn.textContent = 'Skicka'; sendBtn.className = 'btn go';
     }
 
     if (!visible(raw)) box.innerHTML = '';
@@ -385,7 +361,7 @@
           }
         } catch {}
         el = el || document.createElement('span');
-        el.textContent = '📄 ' + name.replace(/\.(pdf|md)$/i, '');
+        el.textContent = name.replace(/\.(pdf|md)$/i, '');
         src.appendChild(el);
       }
     }

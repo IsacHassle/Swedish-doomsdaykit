@@ -43,7 +43,7 @@ Krislådan hamnar i mappen **Krislåda** i din hemmapp.
 - Installationen hämtar allt från originalkällorna och kontrollerar varje bibliotek mot dess kontrollsumma. Den installerar **Ollama** och **AnythingLLM** (AI-apparna) om de saknas.
 - Första gången AnythingLLM öppnas kan den visa en välkomstskärm. Klicka dig igenom den och kör installationen igen om den stannade där.
 - Har du en äldre Mac eller lite utrymme: kör `./install.sh --utan-ai` i mappen, så får du allt utom AI:n (cirka 20 GB).
-- När den är klar: **skriv ut `Krislåda - guide att skriva ut.pdf`**, och tryck **🖨 Skriv ut** på startsidan för första hjälpen, varningssignaler, vatten och värme från 1177, MCF och Livsmedelsverket (cirka 26 sidor). Lägg papperen hos din hemberedskap. Om Macen saknar ström är papperet det du fortfarande kan läsa.
+- När den är klar: **skriv ut `Krislåda - guide att skriva ut.pdf`**, och tryck **Skriv ut** på startsidan för första hjälpen, varningssignaler, vatten och värme från 1177, MCF och Livsmedelsverket (cirka 26 sidor). Lägg papperen hos din hemberedskap. Om Macen saknar ström är papperet det du fortfarande kan läsa.
 
 ---
 
@@ -54,11 +54,11 @@ Resten av sidan är bruksanvisningen. Samma text finns i utskriftsguiden, och AI
 1. Dubbelklicka på **Starta Krislåda.command** (i mappen Krislåda, eller genvägen **Krislåda** på skrivbordet). Den startar också AI-apparna Ollama och AnythingLLM i bakgrunden. Låt Terminal-fönstret som öppnas vara kvar.
 2. **Startsidan** öppnas i webbläsaren på http://localhost:8091. Där finns:
     - **en sökruta** över alla bibliotek (engelska ord fungerar bäst, det finns en svensk knapp också)
-    - **🤖 Fråga AI**: fråga AI:n på svenska, se guiden nedan
-    - **🗺 Karta**: kartan över Sverige, med adressökning
-    - **📍 Var är jag?**: din position på kartan, med en USB GPS-mottagare i datorn
-    - **🖨 Skriv ut**: det viktigaste från 1177, MCF och Livsmedelsverket på papper, att skriva ut medan det finns ström
-    - **✅ Checklista**: MCF:s lista för hemberedskap att bocka av, plus det krislådan själv behöver
+    - **Fråga AI**: fråga AI:n på svenska, se guiden nedan
+    - **Karta**: kartan över Sverige, med adressökning
+    - **Var är jag?**: din position på kartan, med en USB GPS-mottagare i datorn
+    - **Skriv ut**: det viktigaste från 1177, MCF och Livsmedelsverket på papper, att skriva ut medan det finns ström
+    - **Checklista**: MCF:s lista för hemberedskap att bocka av, plus det krislådan själv behöver
     - **29 akutknappar**: hjärt-lungräddning, blödning, brännskador, nedkylning, kolmonoxid, förgiftning, förlossning med mera. De flesta öppnar 1177:s eller MCF:s råd på svenska, med den engelska artikeln ett tryck bort
     - **Svenska myndigheters råd**: 63 sidor från 1177, MCF, Livsmedelsverket och Krisinformation, sparade för läsning utan internet
     - **de 10 viktigaste böckerna** som PDF, och **alla dokument**
@@ -67,34 +67,34 @@ Resten av sidan är bruksanvisningen. Samma text finns i utskriftsguiden, och AI
 | Jag behöver... | Gör så här |
 |---|---|
 | Agera snabbt vid skada eller sjukdom | Startsidan → **Akut**-knapp. Ring **112** om någon telefon fungerar |
-| Ställa en fråga på vanlig svenska | Startsidan → **🤖 Fråga AI**. Den svarar ur böckerna och visar källan |
-| Fråga om ett foto (sår, utslag, växt, trasig sak) | **🤖 Fråga AI** → **📷 Foto** |
+| Ställa en fråga på vanlig svenska | Startsidan → **Fråga AI**. Den svarar ur böckerna och visar källan |
+| Fråga om ett foto (sår, utslag, växt, trasig sak) | **Fråga AI** → **Foto** |
 | Fråga utan att skriva | Macens diktering: 🎤-tangenten, eller tryck Fn två gånger. På mobilen: mikrofonen på tangentbordet |
 | Veta vad myndigheterna råder | Startsidan → *Om krisen eller kriget kommer* |
-| Hitta en adress, närmaste sjukhus, apotek eller dricksvatten | Startsidan → **🗺 Karta** → sökrutan eller knapparna 🏥 💊 🚰 |
-| Läsa av koordinater att skicka vidare | **🗺 Karta** → tryck på kartan |
+| Hitta en adress, närmaste sjukhus, apotek eller dricksvatten | Startsidan → **Karta** → sökrutan eller knapparna Sjukhus, Apotek och Vatten |
+| Läsa av koordinater att skicka vidare | **Karta** → tryck på kartan |
 | Höra viktiga meddelanden | Batteri- eller vevradio på **Sveriges Radio P4** |
 
 Nummer: **112** nödsituation · **1177** sjukvårdsrådgivning · **113 13** information vid kris · **114 14** polisen, ej akut.
 
 ## Så använder du AI:n
 
-AI:n körs helt på Macen. Öppna den från startsidan: **🤖 Fråga AI** (eller direkt på http://localhost:8091/ai/). Samma sida fungerar på familjens mobiler på wifi:t.
+AI:n körs helt på Macen. Öppna den från startsidan: **Fråga AI** (eller direkt på http://localhost:8091/ai/). Samma sida fungerar på familjens mobiler på wifi:t.
 
 1. **Välj läge** högst upp på sidan:
 
     | Läge | Använd när | Tid |
     |---|---|---|
-    | 📚 **Svar ur böckerna** | Det mesta: skador, sjukdom, läkemedel, vatten, mat, värme, myndigheternas råd. Den läser krislådans böcker (1177, MCF och Livsmedelsverket på svenska, sjukvårdsböcker, NHS läkemedelsfakta, vattenrening, mat, MCF-broschyren, Ready.gov-guiderna) och visar vilka böcker svaret bygger på. Tryck på en för att öppna den | Cirka 10 till 40 s |
-    | ⚡ **Snabbt svar** | När det är bråttom, eller för att fråga om ett **foto**. Samma stora AI, utan böckerna | Cirka 5 till 20 s |
-    | 🔋 **Spara batteri** | När Macen går på batteri och du inte vet när du kan ladda. Mindre AI, enklare svar, tar också foton | Snabbare, lättare |
+    | **A · Ur böckerna** | Det mesta: skador, sjukdom, läkemedel, vatten, mat, värme, myndigheternas råd. Den läser krislådans böcker (1177, MCF och Livsmedelsverket på svenska, sjukvårdsböcker, NHS läkemedelsfakta, vattenrening, mat, MCF-broschyren, Ready.gov-guiderna) och visar vilka böcker svaret bygger på. Tryck på en för att öppna den | Cirka 10 till 40 s |
+    | **B · Snabbt svar** | När det är bråttom, eller för att fråga om ett **foto**. Samma stora AI, utan böckerna | Cirka 5 till 20 s |
+    | **C · Spara batteri** | När Macen går på batteri och du inte vet när du kan ladda. Mindre AI, enklare svar, tar också foton | Snabbare, lättare |
 
 2. **Skriv som när du ringer 1177.** Vem (ålder, vikt för barn), vad som hände, när, vad du ser, vad du har hemma. Exempel: *Min pappa är 72 år. Han föll i trappan för 20 minuter sedan och slog i huvudet. Han blöder lite från pannan och verkar förvirrad. Vi har plåster, kompresser och Alvedon. Vad ska vi göra?*
 3. **Fortsätt fråga.** Den minns samtalet ("Vad gör jag om det blir värre?", "Förklara steg 3 enklare"). Tryck **Ny konversation** när du byter ämne.
-4. **Foton:** tryck **📷 Foto**. Bra ljus, nära, en sak per bild, och skriv vad du undrar.
+4. **Foton:** tryck **Foto**. Bra ljus, nära, en sak per bild, och skriv vad du undrar.
 5. **Prata i stället för att skriva:** Macens diktering (🎤-tangenten, eller Fn två gånger), eller mikrofonen på mobilens tangentbord.
 6. **Kontrollera det viktiga.** AI kan ha fel. Öppna källan under svaret, särskilt för doser. Ät aldrig en svamp eller växt för att AI:n säger att den är ätlig.
-7. **Spara ström:** AI:n drar mycket ström medan den svarar. Ställ få och tydliga frågor, välj 🔋, stäng andra appar.
+7. **Spara ström:** AI:n drar mycket ström medan den svarar. Ställ få och tydliga frågor, välj Spara batteri, stäng andra appar.
 8. **Om det inte fungerar** visar raden högst upp på AI-sidan vad som saknas: öppna appen **Ollama** för AI-motorn, eller appen **AnythingLLM** för böckerna. Första svaret efter start tar längre tid medan AI:n laddas.
 
 Livsfara går först: ring **112** om någon telefon fungerar, och använd **Akut**-knapparna i stället för att vänta på ett svar från AI:n.
@@ -103,9 +103,9 @@ Livsfara går först: ring **112** om någon telefon fungerar, och använd **Aku
 
 | Var | Modell | När |
 |---|---|---|
-| Appen **AnythingLLM**, arbetsytan **Crisis** | Gemma 4 26B via Ollama | Samma som 📚. Visar också tidigare samtal (även de från AI-sidan), och du kan dra in egna filer |
-| Appen **Ollama**, modellen **crisis** | Gemma 4 26B med krisinstruktionerna inbyggda | Samma som ⚡. Dra in ett foto i rutan för att fråga om det |
-| Appen **Ollama**, modellen **crisis-small** | Gemma 4 E4B, samma instruktioner | Samma som 🔋 |
+| Appen **AnythingLLM**, arbetsytan **Crisis** | Gemma 4 26B via Ollama | Samma som läge A. Visar också tidigare samtal (även de från AI-sidan), och du kan dra in egna filer |
+| Appen **Ollama**, modellen **crisis** | Gemma 4 26B med krisinstruktionerna inbyggda | Samma som läge B. Dra in ett foto i rutan för att fråga om det |
+| Appen **Ollama**, modellen **crisis-small** | Gemma 4 E4B, samma instruktioner | Samma som läge C |
 | Terminal: `ollama run crisis` | | Skriv frågan, `/bye` för att avsluta |
 
 Instruktionerna som AI:n följer finns i `config/AI-PROMPT.txt`.
@@ -155,10 +155,10 @@ Man klarar sig veckor utan mat men bara dagar utan vatten.
 En offline-karta över hela Sverige (med delar av Norge, Finland och Danmark i samma ram) och en översikt över världen, från OpenStreetMap. Ortnamnen är på svenska. Den har de gator, hus, stigar och husnummer som finns i OpenStreetMap, och du kan zooma in på enskilda hus.
 
 - **Sök** efter vilken ort, by, gata eller adress som helst i Sverige, till exempel *Hornsgatan 50* eller *Storgatan 30, Umeå*. Saknas ett husnummer i OpenStreetMap sätts nålen mellan grannhusen, och kartan säger att läget är ungefärligt.
-- **Närmaste**-knapparna listar de närmaste 🏥 sjukhusen, 🩺 vårdcentralerna, 💊 apoteken, 👮 polisstationerna, 🚒 brandstationerna, 🚰 dricksvattenställena, 🛒 matbutikerna och ⛽ bensinstationerna från kartans mitt.
+- **Närmaste**-knapparna listar de närmaste sjukhusen, vårdcentralerna, apoteken, polisstationerna, brandstationerna, dricksvattenställena, matbutikerna och bensinstationerna från kartans mitt.
 - Knapparna **Stockholm** och **Sverige** hoppar dit.
-- **📍 Var är jag?** visar din position på kartan, följer med när du rör dig, och då räknar närmaste-knapparna från där du står ("1,2 km från dig"). Det fungerar helt utan internet, men **Macen har ingen egen GPS**: koppla in en **USB GPS-mottagare**. Sök efter "USB GPS" (de flesta har en u-blox-krets och kostar cirka 200–400 kr), och skaffa en USB-C-adapter om datorn bara har USB-C. Krislådan hittar mottagaren själv, inga drivrutiner behövs. Första gången kan den behöva några minuter vid ett fönster eller utomhus för att hitta satelliterna. Utan mottagare: sök på en gata, adress eller plats du ser omkring dig.
-- **Ingen USB-mottagare? Låt mobilen vara datorns GPS.** Varje mobil har en riktig GPS som fungerar utan internet. Ställ in mobilen en gång (öppna `/mobil/` på mobilen och följ stegen för iPhone eller Android), tryck sedan **📡 Dela min position med Macen** och låt sidan vara öppen. Då visar Macens karta var du är när du trycker 📍. Krislådan gör ett eget certifikat för det, som bara gäller adresser i ditt hemnätverk och inte kan användas för webbplatser på internet.
+- **Var är jag?** visar din position på kartan, följer med när du rör dig, och då räknar närmaste-knapparna från där du står ("1,2 km från dig"). Det fungerar helt utan internet, men **Macen har ingen egen GPS**: koppla in en **USB GPS-mottagare**. Sök efter "USB GPS" (de flesta har en u-blox-krets och kostar cirka 200–400 kr), och skaffa en USB-C-adapter om datorn bara har USB-C. Krislådan hittar mottagaren själv, inga drivrutiner behövs. Första gången kan den behöva några minuter vid ett fönster eller utomhus för att hitta satelliterna. Utan mottagare: sök på en gata, adress eller plats du ser omkring dig.
+- **Ingen USB-mottagare? Låt mobilen vara datorns GPS.** Varje mobil har en riktig GPS som fungerar utan internet. Ställ in mobilen en gång (öppna `/mobil/` på mobilen och följ stegen för iPhone eller Android), tryck sedan **Dela min position med Macen** och låt sidan vara öppen. Då visar Macens karta var du är när du trycker ⌖ (Var är jag?). Krislådan gör ett eget certifikat för det, som bara gäller adresser i ditt hemnätverk och inte kan användas för webbplatser på internet.
 - **Tryck** på kartan för att läsa av exakta koordinater, som du kan skicka vidare via radio eller skriva ner.
 
 ### 5. Fler bibliotek, om du har plats
@@ -199,7 +199,7 @@ Kartans sökning kan byggas om från färsk OpenStreetMap-data med `scripts/buil
 - Installera **Organic Maps** på mobilen och ladda ner Sverige: en andra karta som klarar sig i dagar på en powerbank.
 - Installera **Kiwix** på mobilen och kopiera över de medicinska biblioteken.
 - Skaffa en batteri- eller vevradio för P4, och en powerbank eller ett batteripaket för Macen.
-- Skaffa en **USB GPS-mottagare** till datorn (cirka 200–400 kr), så visar kartan var du är utan internet. Testa den en gång med 📍 på kartan.
+- Skaffa en **USB GPS-mottagare** till datorn (cirka 200–400 kr), så visar kartan var du är utan internet. Testa den en gång med Var är jag? på kartan.
 
 ## Tack och licenser
 
