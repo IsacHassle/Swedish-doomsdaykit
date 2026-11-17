@@ -13,14 +13,14 @@ KIWIX_VERSION=3.8.2
 PMTILES_VERSION=1.31.2
 
 if [ ! -x "$T/kiwix-tools/kiwix-serve" ]; then
-  echo "Getting kiwix-serve $KIWIX_VERSION"
+  echo "Hämtar kiwix-serve $KIWIX_VERSION"
   curl -fsSL "https://download.kiwix.org/release/kiwix-tools/kiwix-tools_macos-arm64-$KIWIX_VERSION.tar.gz" | tar -xz -C "$T"
   rm -rf "$T/kiwix-tools" && mv "$T/kiwix-tools_macos-arm64-$KIWIX_VERSION" "$T/kiwix-tools"
   xattr -dr com.apple.quarantine "$T/kiwix-tools" 2>/dev/null || true
 fi
 
 if [ ! -x "$T/pmtiles" ]; then
-  echo "Getting pmtiles $PMTILES_VERSION"
+  echo "Hämtar pmtiles $PMTILES_VERSION"
   tmp=$(mktemp -d)
   curl -fsSL -o "$tmp/pmtiles.zip" "https://github.com/protomaps/go-pmtiles/releases/download/v$PMTILES_VERSION/go-pmtiles-${PMTILES_VERSION}_Darwin_arm64.zip"
   unzip -q -o "$tmp/pmtiles.zip" pmtiles -d "$T"
@@ -29,8 +29,8 @@ if [ ! -x "$T/pmtiles" ]; then
 fi
 
 if [ ! -x "$T/venv/bin/python" ]; then
-  echo "Setting up Python for extracting the books"
+  echo "Förbereder Python för att plocka ut böckerna"
   python3 -m venv "$T/venv"
   "$T/venv/bin/pip" install -q --disable-pip-version-check libzim beautifulsoup4 markdownify
 fi
-echo "Tools ready."
+echo "Verktygen är klara."

@@ -56,20 +56,20 @@ def pdf_collections():
     for prefix, folder in cfg["folders"].items():
         z = archive(prefix)
         if not z:
-            print(f"  {folder}: library not downloaded, skipped")
+            print(f"  {folder}: biblioteket är inte hämtat, hoppar över")
             continue
         names, n = cfg["names"].get(prefix, {}), 0
         for e, it in entries(z):
             if it.mimetype == "application/pdf":
                 rel = names.get(e.path) or os.path.join(folder, safe(os.path.basename(e.path)))
                 n += save(os.path.join(OUT, rel), bytes(it.content))
-        print(f"  {folder}: {n} new")
+        print(f"  {folder}: {n} nya")
 
 
 def nhs_medicines():
     z = archive("nhs.uk_en_medicines")
     if not z:
-        print("  NHS Medicines: library not downloaded, skipped")
+        print("  NHS Medicines: biblioteket är inte hämtat, hoppar över")
         return
     n = 0
     for e, it in entries(z):
@@ -86,7 +86,7 @@ def nhs_medicines():
             name = re.sub(r"\s+", " ", re.sub(r"[/:\\]", "", title)).strip().rstrip(".")
             n += save(os.path.join(OUT, "NHS Medicines", name + ".md"),
                       f"# {title}\n\nSource: NHS Medicines A to Z (nhs.uk), offline copy.\n\n{text}\n")
-    print(f"  NHS Medicines: {n} new")
+    print(f"  NHS Medicines: {n} nya")
 
 
 READY_TITLES = [
@@ -110,7 +110,7 @@ LANGUAGES = {"العربية", "English", "Español", "Français", "Kreyòl", "�
 def ready_gov():
     z = archive("www.ready.gov_en")
     if not z:
-        print("  Ready.gov: library not downloaded, skipped")
+        print("  Ready.gov: biblioteket är inte hämtat, hoppar över")
         return
     wanted = {t.lower() for t in READY_TITLES}
     pages, pdfs = {}, {}
@@ -144,11 +144,11 @@ def ready_gov():
             nice = "Ready.gov - " + re.sub(r"^(ready[-_.]?gov[-_]|fema[-_]|ready[-_])", "", name, flags=re.I) \
                 .replace("_", " ").replace("-", " ").replace(" .pdf", ".pdf")
         n += save(os.path.join(OUT, "Ready.gov", nice), bytes(z.get_entry_by_path(path).get_item().content))
-    print(f"  Ready.gov: {n} new")
+    print(f"  Ready.gov: {n} nya")
 
 
 if __name__ == "__main__":
-    print("Taking the books out of the libraries:")
+    print("Plockar ut böckerna ur biblioteken:")
     pdf_collections()
     nhs_medicines()
     ready_gov()

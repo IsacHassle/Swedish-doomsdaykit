@@ -1,32 +1,40 @@
 #!/bin/bash
-# Swedish-doomsdaykit installer.
+# Krislåda (Swedish-doomsdaykit): installation.
 #
-#   ./install.sh           everything (about 45 GB, a few hours)
-#   ./install.sh --no-ai   without the AI (about 15 GB)
+#   ./install.sh           allt (cirka 45 GB, några timmar)
+#   ./install.sh --utan-ai utan AI:n (cirka 20 GB)
 #
-# Needs a Mac with Apple Silicon and an internet connection while installing.
-# After that, everything works with no internet. Re-run any time: it carries on
-# where it stopped and skips what is already done.
+# Kräver en Mac med Apple-chip (M1 eller nyare) och internet medan den installeras.
+# Sedan fungerar allt utan internet. Kör den igen när som helst: den fortsätter där
+# den slutade och hoppar över det som redan är klart.
 set -eu
 KIT="$(cd "$(dirname "$0")" && pwd)"
-cd "$KIT"
 AI=1
-[ "${1:-}" = "--no-ai" ] && AI=0
+case "${1:-}" in --utan-ai|--no-ai) AI=0 ;; esac
 step() { printf '\n\033[1m==> %s\033[0m\n' "$*"; }
 
+# Ligger mappen i Hämtade filer? Flytta den till hemmappen först, så att Krislådan har ett fast hem.
+if [[ "$KIT" == "$HOME/Downloads/"* ]] && [ ! -e "$HOME/Krislåda" ]; then
+  echo "Flyttar Krislåda från Hämtade filer till $HOME/Krislåda"
+  mv "$KIT" "$HOME/Krislåda"
+  exec bash "$HOME/Krislåda/install.sh" "$@"
+fi
+cd "$KIT"
+
 if [ "$(uname -s)" != Darwin ] || [ "$(uname -m)" != arm64 ]; then
-  echo "This kit needs a Mac with Apple Silicon (M1 or newer)."; exit 1
+  echo "Krislådan kräver en Mac med Apple-chip (M1 eller nyare)."; exit 1
 fi
 free_gb=$(df -g "$KIT" | awk 'NR==2 {print $4}')
 need=$([ $AI = 1 ] && echo 50 || echo 22)
 if [ ! -f "$KIT/maps/sweden.pmtiles" ] && [ "$free_gb" -lt "$need" ]; then
-  echo "Only $free_gb GB free here; the kit needs about $need GB. Free up space, then run this again."; exit 1
+  echo "Bara $free_gb GB ledigt här, Krislådan behöver cirka $need GB. Frigör utrymme och kör igen."; exit 1
 fi
-chmod +x "$KIT"/scripts/*.sh "$KIT/Start Crisis Kit.command"
+chmod +x "$KIT"/scripts/*.sh "$KIT"/*.command
+xattr -dr com.apple.quarantine "$KIT" 2>/dev/null || true   # so "Starta Krislåda.command" opens without a warning
 
-install_app() {   # name, dmg url
+install_app() {   # namn, adress till dmg-filen
   [ -d "/Applications/$1.app" ] && return 0
-  step "Installing $1"
+  step "Installerar $1"
   tmp=$(mktemp -d)
   curl -fL --progress-bar -o "$tmp/app.dmg" "$2"
   vol=$(hdiutil attach -nobrowse -readonly "$tmp/app.dmg" | awk -F'\t' '/\/Volumes\// {print $NF; exit}')
@@ -35,38 +43,38 @@ install_app() {   # name, dmg url
   rm -rf "$tmp"
 }
 
-step "1/5 Tools"
+step "1/5 Verktyg"
 bash scripts/get-tools.sh
 
-step "2/5 Offline libraries (about 14 GB; progress also in logs/download.log)"
+step "2/5 Bibliotek för offline-läsning (cirka 14 GB)"
 bash scripts/download-library.sh
 if tail -n 60 logs/download.log | grep -q "^FAIL"; then
-  echo "Some libraries failed to download. Run ./install.sh again to retry them."
+  echo "Några bibliotek kunde inte hämtas. Kör installationen igen så försöker den på nytt."
 fi
 
-step "3/5 Maps of Sweden and the world (about 4.5 GB)"
+step "3/5 Kartor över Sverige och världen (cirka 4,5 GB)"
 bash scripts/get-maps.sh
 
-step "4/5 Documents and books"
+step "4/5 Dokument och böcker"
 bash scripts/get-documents.sh
 
 if [ $AI = 1 ]; then
-  step "5/5 Local AI (about 27 GB of models, then the books are loaded into it)"
+  step "5/5 AI på din Mac (cirka 27 GB modeller, sedan läses böckerna in)"
   install_app Ollama "https://ollama.com/download/Ollama.dmg"
   install_app AnythingLLM "https://cdn.anythingllm.com/latest/AnythingLLMDesktop-Silicon.dmg"
   bash scripts/setup-ai.sh
 else
-  step "5/5 Local AI skipped (--no-ai)"
+  step "5/5 AI hoppades över (--utan-ai)"
 fi
 
-ln -sfn "$KIT" "$HOME/Desktop/Crisis Kit"
-step "Done"
+ln -sfn "$KIT" "$HOME/Desktop/Krislåda"
+step "Klart"
 cat <<EOF
-The kit is installed in $KIT (shortcut on the Desktop: "Crisis Kit").
+Krislådan finns i $KIT (genväg på skrivbordet: "Krislåda").
 
-  Start it:  double-click "Start Crisis Kit.command"
-  Then open: http://localhost:8091  (phones on the same Wi-Fi: the address it prints)
+  Starta:   dubbelklicka på "Starta Krislåda.command"
+  Öppna:    http://localhost:8091  (mobiler på samma wifi: adressen som visas)
 
-Print "Krislåda - guide to print.pdf" and keep it with your emergency supplies.
-Test it once a month with Wi-Fi turned off.
+Skriv ut "Krislåda - guide att skriva ut.pdf" och lägg den hos din hemberedskap.
+Testa en gång i månaden med wifi avstängt.
 EOF

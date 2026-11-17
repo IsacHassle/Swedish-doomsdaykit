@@ -267,7 +267,7 @@ TEMPLATE = r"""<!doctype html>
   <h2>Alla bibliotek · All libraries</h2>
   %GROUPS%
 
-  <footer>Krislåda · Swedish-doomsdaykit · Start: Start Crisis Kit.command · Libraries by Kiwix, map © OpenStreetMap</footer>
+  <footer>Krislåda · Swedish-doomsdaykit · Starta: Starta Krislåda.command · Bibliotek från Kiwix, karta © OpenStreetMap</footer>
 </main>
 <script>
   const KIWIX = location.protocol + '//' + (location.hostname || 'localhost') + ':8090';

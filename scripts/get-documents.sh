@@ -10,7 +10,7 @@ mkdir -p "$D"
 
 get() {   # url, file name
   [ -s "$D/$2" ] && return 0
-  echo "Getting $2"
+  echo "Hämtar $2"
   curl -fsSL -o "$D/$2.part" "$1" && mv "$D/$2.part" "$D/$2"
 }
 get "https://rib.msb.se/filer/pdf/30828.pdf" "Om-krisen-eller-kriget-kommer.pdf"
@@ -20,4 +20,4 @@ get "https://rib.msb.se/filer/pdf/31523.pdf" "In-case-of-crisis-or-war.pdf"
 cp "$KIT/README.md" "$D/Krislåda - guide.md"
 
 "$KIT/tools/venv/bin/python" "$KIT/scripts/extract-documents.py"
-echo "Documents ready."
+echo "Dokumenten är klara."

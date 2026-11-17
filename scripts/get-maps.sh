@@ -19,16 +19,16 @@ for d in 0 1 2 3 4 5 6 7; do
   day=$(date -v-"${d}"d +%Y%m%d)
   if curl -fsI "https://build.protomaps.com/$day.pmtiles" >/dev/null 2>&1; then build="https://build.protomaps.com/$day.pmtiles"; break; fi
 done
-[ -n "$build" ] || { echo "Could not reach build.protomaps.com. Check the internet connection and try again."; exit 1; }
+[ -n "$build" ] || { echo "Kunde inte nå build.protomaps.com. Kontrollera internetanslutningen och försök igen."; exit 1; }
 
 valid() { [ -f "$1" ] && [ "$(head -c 7 "$1")" = "PMTiles" ]; }
 
 if ! valid "$M/world.pmtiles"; then
-  echo "Getting the world overview map"
+  echo "Hämtar världskartan (översikt)"
   "$PMTILES" extract "$build" "$M/world.pmtiles.part" --maxzoom=6 && mv "$M/world.pmtiles.part" "$M/world.pmtiles"
 fi
 if ! valid "$M/sweden.pmtiles"; then
-  echo "Getting the Sweden map (about 4.5 GB, this takes a while)"
+  echo "Hämtar Sverigekartan (cirka 4,5 GB, det tar en stund)"
   "$PMTILES" extract "$build" "$M/sweden.pmtiles.part" --bbox="$SWEDEN_BBOX" && mv "$M/sweden.pmtiles.part" "$M/sweden.pmtiles"
 fi
 
@@ -36,10 +36,10 @@ fi
 # OpenStreetMap with scripts/build-map-index.py (needs osmium).
 DATA="$KIT/web/map/data"
 if [ ! -f "$DATA/places.json.gz" ]; then
-  echo "Getting the map search"
+  echo "Hämtar kartans sökning"
   tmp=$(mktemp -d)
   curl -fsSL -o "$tmp/map-search.tar.gz" "https://github.com/$REPO/releases/latest/download/map-search.tar.gz"
   mkdir -p "$DATA" && tar -xzf "$tmp/map-search.tar.gz" -C "$DATA"
   rm -rf "$tmp"
 fi
-echo "Maps ready."
+echo "Kartorna är klara."

@@ -1,184 +1,199 @@
-# Swedish-doomsdaykit · Krislåda
+# Krislåda · Swedish-doomsdaykit
 
-An offline crisis kit for Sweden, on a Mac. When the internet, the phone network or the power grid is down, it still gives you:
+En krislåda för Mac som fungerar helt utan internet. När internet, mobilnätet eller elen ligger nere har du ändå:
 
-- **First aid and medicine:** 29 one-tap emergency topics, medical encyclopedias, field medicine handbooks and the NHS medicines guide
-- **A local AI you can ask in Swedish**, which answers from the kit's books and shows its sources, and can look at photos
-- **A map of all of Sweden** down to single houses, with search for every town, street and address, and the nearest hospital, pharmacy, police, drinking water, food and fuel
-- **What to do in each kind of emergency:** the Swedish government brochure *Om krisen eller kriget kommer*, and guides for radiation, chemical incidents, power cuts, winter storms and more
-- **Phones on the same Wi-Fi can use all of it too.** The Mac does the work, no internet needed
+- **Första hjälpen och sjukvård:** 29 akuta ämnen ett klick bort, medicinska uppslagsverk, fältsjukvårdsböcker och NHS läkemedelsguide
+- **En AI du kan fråga på svenska**, som svarar ur krislådans böcker, visar källan och kan titta på foton
+- **Karta över hela Sverige** ner till enskilda hus, med sökning på varje ort, gata och adress, och närmaste sjukhus, apotek, polis, dricksvatten, mat och bensin
+- **Vad du gör i varje slags kris:** myndigheternas broschyr *Om krisen eller kriget kommer*, och guider för strålning, kemolyckor, strömavbrott, vinterstormar med mera
+- **Mobiler på samma wifi kan använda allt.** Macen gör jobbet, inget internet behövs
 
-*På svenska:* En krislåda för Mac som fungerar helt utan internet. Sjukvårdsråd, en AI du kan fråga på svenska, karta över hela Sverige med adressök, och myndigheternas råd. Mobiler på samma wifi kan använda allt. Installera med `./install.sh`.
+Allt körs på din egen dator. Inget skickas någonstans.
 
-Everything runs on your own computer. Nothing is sent anywhere.
-
-| Start page | Ask the AI, in Swedish | Map of all of Sweden |
+| Startsidan | Fråga AI:n på svenska | Karta över hela Sverige |
 |---|---|---|
-| ![Start page with emergency topics](docs/screenshots/start-page.png) | ![The AI answering how to keep a flat warm in a power cut](docs/screenshots/ai.png) | ![Map with search, zoomed in on Södersjukhuset](docs/screenshots/map.png) |
+| ![Startsidan med akuta ämnen](docs/screenshots/start-page.png) | ![AI:n svarar hur man håller lägenheten varm vid strömavbrott](docs/screenshots/ai.png) | ![Kartan med sökning, inzoomad på Södersjukhuset](docs/screenshots/map.png) |
 
-## Install
+## Ladda ner och installera
 
-You need a Mac with Apple Silicon (M1 or newer), about **50 GB** free (16 GB RAM or more recommended for the AI), and an internet connection while installing. It takes a few hours, mostly downloading.
+**Du behöver:** en Mac med Apple-chip (M1 eller nyare; se Apple-menyn → Om den här datorn → "Chip: Apple M…"), cirka **50 GB** ledigt utrymme, gärna 16 GB minne för AI:n, och internet medan den installeras. Installationen tar några timmar, mest nedladdning. Låt Macen vara på och ansluten till ström.
+
+### Sätt 1: ladda ner och dubbelklicka
+
+1. **[⬇️ Ladda ner Krislåda](https://github.com/IsacHassle/Swedish-doomsdaykit/releases/latest/download/Krislada.zip)** (en liten fil, under 1 MB).
+2. Öppna **Hämtade filer** och dubbelklicka på **Krislada.zip**. Du får en mapp som heter **Krislåda**.
+3. Öppna mappen och dubbelklicka på **Installera Krislåda.command**.
+4. Macen säger troligen att den inte kan kontrollera filen, eftersom den inte kommer från App Store. Klicka **Klar**, öppna **Systeminställningar → Integritet och säkerhet**, scrolla ner och klicka **Öppna ändå** vid "Installera Krislåda.command". Bekräfta med ditt lösenord eller Touch ID.
+5. Ett Terminal-fönster öppnas och visar hur det går. Krislådan flyttar sig själv till mappen **Krislåda** i din hemmapp.
+
+### Sätt 2: en rad i Terminal
+
+1. Öppna **Terminal** (tryck Cmd + mellanslag, skriv *Terminal*, tryck Enter).
+2. Klistra in den här raden och tryck Enter:
 
 ```bash
-git clone https://github.com/IsacHassle/Swedish-doomsdaykit.git ~/Crisis
-cd ~/Crisis
-./install.sh
+curl -fsSL https://raw.githubusercontent.com/IsacHassle/Swedish-doomsdaykit/main/hamta.sh | bash
 ```
 
-(Or download the ZIP from GitHub, unzip it, and run `./install.sh` in that folder.)
+Krislådan hamnar i mappen **Krislåda** i din hemmapp.
 
-The installer downloads everything from the original sources, checks every library against its published checksum, installs **Ollama** and **AnythingLLM** if they are missing, sets up the AI, and puts a **Crisis Kit** shortcut on the Desktop. If anything stops, run `./install.sh` again: it carries on where it stopped. `./install.sh --no-ai` installs everything except the AI (about 20 GB).
+### Bra att veta
 
-The first time AnythingLLM opens it may show a welcome screen: click through it, then run `./install.sh` again if the AI step stopped there.
-
-When it is done: **print `Krislåda - guide to print.pdf`** and keep it with your emergency supplies. If the Mac is out of power, paper is the copy you can still read.
+- Om något avbryts: kör installationen igen (dubbelklicka igen eller klistra in raden igen). Den fortsätter där den slutade.
+- Installationen hämtar allt från originalkällorna och kontrollerar varje bibliotek mot dess kontrollsumma. Den installerar **Ollama** och **AnythingLLM** (AI-apparna) om de saknas.
+- Första gången AnythingLLM öppnas kan den visa en välkomstskärm. Klicka dig igenom den och kör installationen igen om den stannade där.
+- Har du en äldre Mac eller lite utrymme: kör `./install.sh --utan-ai` i mappen, så får du allt utom AI:n (cirka 20 GB).
+- När den är klar: **skriv ut `Krislåda - guide att skriva ut.pdf`** och lägg den hos din hemberedskap. Om Macen saknar ström är papperet det du fortfarande kan läsa.
 
 ---
 
-Everything below is the user guide. The same text is in the printable PDF, and the AI has read it too.
+Resten av sidan är bruksanvisningen. Samma text finns i utskriftsguiden, och AI:n har läst den.
 
-## Start here
+## Börja här
 
-1. Double-click **Start Crisis Kit.command** (in the kit folder, or the **Crisis Kit** shortcut on the Desktop). It also starts the AI apps Ollama and AnythingLLM in the background. Keep the Terminal window it opens.
-2. The **start page** opens in your browser at http://localhost:8091. It has:
-    - **one search box** across every library (English words work best; there is a Swedish button too)
-    - **🤖 Fråga AI**: ask the AI in Swedish, see the guide below
-    - **🗺 Karta**: the map of Sweden, with address search
-    - **29 emergency buttons**: CPR, bleeding, burns, hypothermia, carbon monoxide, poisoning, childbirth and more
-    - **the 10 key books** as PDFs, and **all documents**
-3. **Family phones:** join the same Wi-Fi and open the address the Terminal window prints (for example `http://192.168.1.23:8091`). No internet needed. The AI and the map work from phones too; the Mac does the work. A router on battery power works, and so does the Mac's own hotspot.
+1. Dubbelklicka på **Starta Krislåda.command** (i mappen Krislåda, eller genvägen **Krislåda** på skrivbordet). Den startar också AI-apparna Ollama och AnythingLLM i bakgrunden. Låt Terminal-fönstret som öppnas vara kvar.
+2. **Startsidan** öppnas i webbläsaren på http://localhost:8091. Där finns:
+    - **en sökruta** över alla bibliotek (engelska ord fungerar bäst, det finns en svensk knapp också)
+    - **🤖 Fråga AI**: fråga AI:n på svenska, se guiden nedan
+    - **🗺 Karta**: kartan över Sverige, med adressökning
+    - **29 akutknappar**: hjärt-lungräddning, blödning, brännskador, nedkylning, kolmonoxid, förgiftning, förlossning med mera
+    - **de 10 viktigaste böckerna** som PDF, och **alla dokument**
+3. **Familjens mobiler:** anslut till samma wifi och öppna adressen som Terminal-fönstret visar (till exempel `http://192.168.1.23:8091`). Inget internet behövs. AI:n och kartan fungerar från mobilen också, Macen gör jobbet. En router på batteri fungerar, och Macens egen delade anslutning också.
 
-| I need to... | Do this |
+| Jag behöver... | Gör så här |
 |---|---|
-| Act fast on an injury or illness | Start page → **Akut** button. Call **112** if any phone works |
-| Ask a question in plain Swedish or English | Start page → **🤖 Fråga AI**. It answers from the books and names its sources |
-| Ask about a photo (wound, rash, plant, broken part) | **🤖 Fråga AI** → **📷 Foto** |
-| Ask without typing | Mac dictation: the 🎤 key, or press Fn twice. On a phone, the keyboard's microphone |
-| Know what Swedish authorities advise | Start page → *Om krisen eller kriget kommer* |
-| Find an address, the nearest hospital, pharmacy or drinking water | Start page → **🗺 Karta** → search box or the 🏥 💊 🚰 buttons |
-| Read coordinates to pass on | **🗺 Karta** → tap the map |
-| Hear official warnings | Battery or crank radio on **Sveriges Radio P4** |
+| Agera snabbt vid skada eller sjukdom | Startsidan → **Akut**-knapp. Ring **112** om någon telefon fungerar |
+| Ställa en fråga på vanlig svenska | Startsidan → **🤖 Fråga AI**. Den svarar ur böckerna och visar källan |
+| Fråga om ett foto (sår, utslag, växt, trasig sak) | **🤖 Fråga AI** → **📷 Foto** |
+| Fråga utan att skriva | Macens diktering: 🎤-tangenten, eller tryck Fn två gånger. På mobilen: mikrofonen på tangentbordet |
+| Veta vad myndigheterna råder | Startsidan → *Om krisen eller kriget kommer* |
+| Hitta en adress, närmaste sjukhus, apotek eller dricksvatten | Startsidan → **🗺 Karta** → sökrutan eller knapparna 🏥 💊 🚰 |
+| Läsa av koordinater att skicka vidare | **🗺 Karta** → tryck på kartan |
+| Höra viktiga meddelanden | Batteri- eller vevradio på **Sveriges Radio P4** |
 
-Swedish numbers: **112** emergency · **1177** health advice · **113 13** crisis information · **114 14** police, non-urgent.
+Nummer: **112** nödsituation · **1177** sjukvårdsrådgivning · **113 13** information vid kris · **114 14** polisen, ej akut.
 
-## Using the AI
+## Så använder du AI:n
 
-The AI runs entirely on the Mac. Open it from the start page: **🤖 Fråga AI** (or go straight to http://localhost:8091/ai/). The same page works on family phones on the Wi-Fi.
+AI:n körs helt på Macen. Öppna den från startsidan: **🤖 Fråga AI** (eller direkt på http://localhost:8091/ai/). Samma sida fungerar på familjens mobiler på wifi:t.
 
-1. **Pick a mode** at the top of the page:
+1. **Välj läge** högst upp på sidan:
 
-    | Mode | Use it for | Speed |
+    | Läge | Använd när | Tid |
     |---|---|---|
-    | 📚 **Svar ur böckerna** (answers from the books) | Most questions: injuries, illness, medicines, water, food, heat, official advice. It reads the kit's books (medical handbooks, NHS medicines, water treatment, food, MCF brochure, Ready.gov guides) and lists the books it used under the answer; tap one to open it | About 10 to 40 s |
-    | ⚡ **Snabbt svar** (quick) | When it is urgent, or to ask about a **photo**. Same large model, without the books | About 5 to 20 s |
-    | 🔋 **Spara batteri** (battery saver) | When the Mac is on battery and you do not know when you can charge. Smaller model, simpler answers, also takes photos | Faster, lighter |
+    | 📚 **Svar ur böckerna** | Det mesta: skador, sjukdom, läkemedel, vatten, mat, värme, myndigheternas råd. Den läser krislådans böcker (sjukvårdsböcker, NHS läkemedelsfakta, vattenrening, mat, MCF-broschyren, Ready.gov-guiderna) och visar vilka böcker svaret bygger på. Tryck på en för att öppna den | Cirka 10 till 40 s |
+    | ⚡ **Snabbt svar** | När det är bråttom, eller för att fråga om ett **foto**. Samma stora AI, utan böckerna | Cirka 5 till 20 s |
+    | 🔋 **Spara batteri** | När Macen går på batteri och du inte vet när du kan ladda. Mindre AI, enklare svar, tar också foton | Snabbare, lättare |
 
-2. **Write like you are calling 1177.** Who (age, weight for children), what happened, when, what you see, what you have at home. Example: *Min pappa är 72 år. Han föll i trappan för 20 minuter sedan och slog i huvudet. Han blöder lite från pannan och verkar förvirrad. Vi har plåster, kompresser och Alvedon. Vad ska vi göra?*
-3. **Keep asking.** It remembers the conversation ("What if it gets worse?", "Explain step 3 more simply"). Press **Ny konversation** when you change subject.
-4. **Photos:** press **📷 Foto**. Good light, close up, one thing per photo, and say what you want to know.
-5. **Speak instead of typing:** Mac dictation (the 🎤 key, or Fn twice), or the microphone on a phone keyboard.
-6. **Check what matters.** AI can be wrong. Open the source under the answer, especially for doses. Never eat a mushroom or plant because the AI says it is edible.
-7. **Save power:** the AI uses a lot of power while it answers. Ask few, clear questions, choose 🔋, close other apps.
-8. **If it does not work,** the line at the top of the AI page says what is missing: open the **Ollama** app for the AI engine, or the **AnythingLLM** app for the books. The first answer after starting is slower while the model loads.
+2. **Skriv som när du ringer 1177.** Vem (ålder, vikt för barn), vad som hände, när, vad du ser, vad du har hemma. Exempel: *Min pappa är 72 år. Han föll i trappan för 20 minuter sedan och slog i huvudet. Han blöder lite från pannan och verkar förvirrad. Vi har plåster, kompresser och Alvedon. Vad ska vi göra?*
+3. **Fortsätt fråga.** Den minns samtalet ("Vad gör jag om det blir värre?", "Förklara steg 3 enklare"). Tryck **Ny konversation** när du byter ämne.
+4. **Foton:** tryck **📷 Foto**. Bra ljus, nära, en sak per bild, och skriv vad du undrar.
+5. **Prata i stället för att skriva:** Macens diktering (🎤-tangenten, eller Fn två gånger), eller mikrofonen på mobilens tangentbord.
+6. **Kontrollera det viktiga.** AI kan ha fel. Öppna källan under svaret, särskilt för doser. Ät aldrig en svamp eller växt för att AI:n säger att den är ätlig.
+7. **Spara ström:** AI:n drar mycket ström medan den svarar. Ställ få och tydliga frågor, välj 🔋, stäng andra appar.
+8. **Om det inte fungerar** visar raden högst upp på AI-sidan vad som saknas: öppna appen **Ollama** för AI-motorn, eller appen **AnythingLLM** för böckerna. Första svaret efter start tar längre tid medan AI:n laddas.
 
-Life-threatening situations come first: call **112** if any phone works, and use the **Akut** buttons rather than waiting for an AI answer.
+Livsfara går först: ring **112** om någon telefon fungerar, och använd **Akut**-knapparna i stället för att vänta på ett svar från AI:n.
 
-### Other ways to use the same AI on the Mac
+### Andra sätt att använda samma AI på Macen
 
-| Where | Model | When |
+| Var | Modell | När |
 |---|---|---|
-| **AnythingLLM** app, workspace **Crisis** | Gemma 4 26B through Ollama | Same as 📚. Also shows earlier conversations (including those from the AI page), and lets you drag in your own files |
-| **Ollama** app, model **crisis** | Gemma 4 26B with the crisis instructions built in | Same as ⚡. Drag a photo into the chat box to ask about it |
-| **Ollama** app, model **crisis-small** | Gemma 4 E4B, same instructions | Same as 🔋 |
-| Terminal: `ollama run crisis` | | Type the question; `/bye` to quit |
+| Appen **AnythingLLM**, arbetsytan **Crisis** | Gemma 4 26B via Ollama | Samma som 📚. Visar också tidigare samtal (även de från AI-sidan), och du kan dra in egna filer |
+| Appen **Ollama**, modellen **crisis** | Gemma 4 26B med krisinstruktionerna inbyggda | Samma som ⚡. Dra in ett foto i rutan för att fråga om det |
+| Appen **Ollama**, modellen **crisis-small** | Gemma 4 E4B, samma instruktioner | Samma som 🔋 |
+| Terminal: `ollama run crisis` | | Skriv frågan, `/bye` för att avsluta |
 
-The instructions the crisis AI follows are in `config/AI-PROMPT.txt`.
+Instruktionerna som AI:n följer finns i `config/AI-PROMPT.txt`.
 
-## What is in the kit, and why
+## Vad finns i krislådan, och varför
 
-About 45 GB in all: 14 GB of libraries, 4.5 GB of maps, 1 GB of documents, 27 GB of AI models. It covers what matters first when normal life stops: keeping people alive, then water, warmth, food and information, then getting around.
+Cirka 45 GB totalt: 14 GB bibliotek, 4,5 GB kartor, 1 GB dokument, 27 GB AI-modeller. Den täcker det som spelar roll först när vardagen slutar fungera: att hålla människor vid liv, sedan vatten, värme, mat och information, sedan att hitta rätt.
 
-### 1. Medicine: the most important part
+### 1. Sjukvård: den viktigaste delen
 
-When ambulances are slow or unreachable, the right first-aid steps decide outcomes. Several sources are included because each covers a different angle, and cross-checking matters.
+När ambulansen dröjer eller inte går att nå avgör rätt första hjälpen hur det går. Flera källor finns med eftersom var och en täcker olika saker, och det är viktigt att kunna jämföra.
 
-| Library | Why it is here |
+| Bibliotek | Varför det finns med |
 |---|---|
-| Medical Library | Books written for situations without a doctor: Where There Is No Doctor, Survival and Austere Medicine, Emergency War Surgery, A Book for Midwives, Where There Is No Dentist |
-| Military Medicine | Trauma: stopping bleeding, splinting, emergency childbirth, caring for someone over days with few supplies |
-| WikiMed and MDWiki | Medical encyclopedias with images: look up symptoms and diseases, recognise rashes, bites, injuries |
-| MedlinePlus | Plain-language health and medicine information from the US National Library of Medicine |
-| NHS Medicines A to Z | What a medicine is for, side effects, who must not take it |
-| CDC Health Information | Infectious disease and outbreaks: how illness spreads, how to protect a household |
+| Medical Library | Böcker skrivna för när det inte finns någon läkare: Where There Is No Doctor, Survival and Austere Medicine, Emergency War Surgery, A Book for Midwives, Where There Is No Dentist |
+| Military Medicine | Trauma: stoppa blödning, spjäla, nödförlossning, ta hand om någon i flera dagar med lite material |
+| WikiMed och MDWiki | Medicinska uppslagsverk med bilder: symtom och sjukdomar, känna igen utslag, bett, skador |
+| MedlinePlus | Lättläst information om hälsa och läkemedel från USA:s nationalbibliotek för medicin |
+| NHS Medicines A to Z | Vad ett läkemedel är till för, biverkningar, vem som inte får ta det |
+| CDC Health Information | Smittsamma sjukdomar och utbrott: hur sjukdom sprids, hur man skyddar ett hushåll |
 
-### 2. Water, food, shelter, and each kind of emergency
+### 2. Vatten, mat, skydd och varje slags kris
 
-People survive weeks without food but days without water.
+Man klarar sig veckor utan mat men bara dagar utan vatten.
 
-| Library | Why it is here |
+| Bibliotek | Varför det finns med |
 |---|---|
-| Water Treatment Library | Boiling, filtering and chemically treating water |
-| Food for Preppers | Storing food and cooking without normal power or ingredients |
-| Post Disaster Resource Library | Shelter, sanitation and recovery after a disaster, plus the SAS Survival Handbook |
-| Low-tech Magazine | Heating, cooking and living with little or no electricity |
-| Ready.gov (US FEMA) | Step-by-step guides the Swedish brochure does not go into: radiation emergencies, nuclear explosion, chemical incidents, explosions, long power outages, winter weather, pandemics. The AI reads these guides and FEMA's "Are You Ready?" handbook |
-| A Library of Knots | Shelter, lashing, carrying |
+| Water Treatment Library | Koka, filtrera och rena vatten kemiskt |
+| Food for Preppers | Förvara mat och laga mat utan el eller vanliga råvaror |
+| Post Disaster Resource Library | Skydd, sanitet och återuppbyggnad efter en katastrof, plus SAS Survival Handbook |
+| Low-tech Magazine | Värme, matlagning och vardag med lite eller ingen el |
+| Ready.gov (USA:s FEMA) | Steg-för-steg-guider som den svenska broschyren inte går in på: strålning, kärnvapenexplosion, kemolyckor, explosioner, långa strömavbrott, vinterväder, pandemier. AI:n läser guiderna och FEMA:s handbok "Are You Ready?" |
+| A Library of Knots | Knopar för skydd, surrning och bärande |
 
 ### 3. Information
 
-| Item | Why it is here |
+| Innehåll | Varför det finns med |
 |---|---|
-| MCF brochure, Swedish and English | The official Swedish advice: home preparedness, warning signals, what society expects of you |
-| Swedish Wikipedia | Every article's opening section: Swedish places, plants, animals, mushrooms, and almost anything else |
+| MCF:s broschyr, på svenska och engelska | Myndigheternas råd: hemberedskap, varningssignaler, vad samhället förväntar sig av dig |
+| Svenska Wikipedia | Inledningen av varje artikel: svenska platser, växter, djur, svampar och nästan allt annat |
 
-### 4. Maps
+### 4. Kartan
 
-An offline map of all of Sweden (with parts of Norway, Finland and Denmark inside the same frame) plus a world overview, from OpenStreetMap. Place names are in Swedish. It holds the streets, buildings, paths and house numbers that OpenStreetMap has, and zooms in to single houses.
+En offline-karta över hela Sverige (med delar av Norge, Finland och Danmark i samma ram) och en översikt över världen, från OpenStreetMap. Ortnamnen är på svenska. Den har de gator, hus, stigar och husnummer som finns i OpenStreetMap, och du kan zooma in på enskilda hus.
 
-- **Search** for any town, village, street or address in Sweden, such as *Hornsgatan 50* or *Storgatan 30, Umeå*. If a house number is missing from OpenStreetMap, the pin goes between the neighbouring houses and the map says it is approximate.
-- **Nearest** buttons list the closest 🏥 hospitals, 🩺 health centres, 💊 pharmacies, 👮 police, 🚒 fire stations, 🚰 drinking water, 🛒 food shops and ⛽ fuel to the middle of the map.
-- **Stockholm** and **Sverige** buttons jump there; the ⦿ button shows where you are (on a phone with GPS).
-- **Tap** the map to read exact coordinates, which you can pass on by radio or note down for others.
+- **Sök** efter vilken ort, by, gata eller adress som helst i Sverige, till exempel *Hornsgatan 50* eller *Storgatan 30, Umeå*. Saknas ett husnummer i OpenStreetMap sätts nålen mellan grannhusen, och kartan säger att läget är ungefärligt.
+- **Närmaste**-knapparna listar de närmaste 🏥 sjukhusen, 🩺 vårdcentralerna, 💊 apoteken, 👮 polisstationerna, 🚒 brandstationerna, 🚰 dricksvattenställena, 🛒 matbutikerna och ⛽ bensinstationerna från kartans mitt.
+- Knapparna **Stockholm** och **Sverige** hoppar dit, och ⦿ visar var du är (på en mobil med GPS).
+- **Tryck** på kartan för att läsa av exakta koordinater, som du kan skicka vidare via radio eller skriva ner.
 
-### 5. More libraries, if you have the space
+### 5. Fler bibliotek, om du har plats
 
-`config/libraries.txt` lists extras you can switch on by removing the `#` in front of them, then running `bash scripts/download-library.sh`: Swedish Wikipedia in full with images (17 GB), English Wikipedia (13 GB, or 49 GB in full), iFixit repair guides, and Q&A sites for home repair, cars, gardening, cooking, the outdoors and amateur radio. Run `bash scripts/get-documents.sh` and `bash scripts/embed-documents.sh` afterwards if you add libraries with books in them.
+`config/libraries.txt` listar extra bibliotek som du slår på genom att ta bort `#` framför dem och köra `bash scripts/download-library.sh`: Svenska Wikipedia i sin helhet med bilder (17 GB), engelska Wikipedia (13 GB, eller 49 GB i sin helhet), iFixits reparationsguider, och frågor och svar om husreparationer, bilar, odling, matlagning, friluftsliv och amatörradio. Kör `bash scripts/get-documents.sh` och `bash scripts/embed-documents.sh` efteråt om du lägger till bibliotek med böcker i.
 
-## Add your own documents
+## Lägg till egna dokument
 
-Put files in the kit's `documents/` folder (contact lists, medication lists, insurance papers, manuals for your generator or water filter), then run `bash scripts/embed-documents.sh`. The AI can then answer from them too. You can also drag files straight into the Crisis workspace in AnythingLLM. Your own documents never leave the Mac and are never part of the repository.
+Lägg filer i krislådans mapp `documents/` (kontaktlistor, läkemedelslistor, försäkringspapper, manualer till elverk eller vattenfilter) och kör `bash scripts/embed-documents.sh`. Då kan AI:n svara ur dem också. Du kan också dra in filer direkt i arbetsytan Crisis i AnythingLLM. Dina egna dokument lämnar aldrig Macen.
 
-## Folder layout
+## Mappar
 
-| Path | Contents |
+| Sökväg | Innehåll |
 |---|---|
-| `install.sh` | Installs or repairs everything |
-| `Start Crisis Kit.command` | Double-click to start everything |
-| `config/` | `libraries.txt` (which libraries), `AI-PROMPT.txt` (the AI's instructions), `document-names.json` (book titles) |
-| `scripts/` | `share-library.sh` (start), `serve-web.py` (web server, and the bridge from the AI page to Ollama and AnythingLLM), `build-home.py` (start page), the `get-*.sh` download steps, `setup-ai.sh`, `embed-documents.sh`, `extract-documents.py`, `build-map-index.py` (map search) |
-| `web/` | The start page, the AI page (`web/ai/`) and the map (`web/map/`) |
-| `library/` | Offline libraries (.zim files), downloaded. The Kiwix app can open them too |
-| `documents/` | MCF brochure, and `library/` with every book as a PDF, named by title, downloaded |
-| `maps/` | Sweden and world map files, downloaded |
-| `tools/`, `logs/` | Helper programs and logs |
+| `Installera Krislåda.command` | Installerar eller lagar allt |
+| `Starta Krislåda.command` | Dubbelklicka för att starta allt |
+| `config/` | `libraries.txt` (vilka bibliotek), `AI-PROMPT.txt` (AI:ns instruktioner), `document-names.json` (boktitlar) |
+| `scripts/` | `share-library.sh` (start), `serve-web.py` (webbservern, och kopplingen mellan AI-sidan och Ollama/AnythingLLM), `build-home.py` (startsidan), nedladdningsstegen `get-*.sh`, `setup-ai.sh`, `embed-documents.sh`, `extract-documents.py`, `build-map-index.py` (kartans sökning) |
+| `web/` | Startsidan, AI-sidan (`web/ai/`) och kartan (`web/map/`) |
+| `library/` | Biblioteken (.zim-filer), nedladdade. Appen Kiwix kan också öppna dem |
+| `documents/` | MCF-broschyren, och `library/` med varje bok som PDF, namngiven efter titel |
+| `maps/` | Kartfilerna för Sverige och världen |
+| `tools/`, `logs/` | Hjälpprogram och loggar |
 
-## Keep it fresh
+## Håll den uppdaterad
 
-Libraries do not update themselves. A few times a year, put newer file names from https://download.kiwix.org/zim/ into `config/libraries.txt` and run `bash scripts/download-library.sh`. Re-running is always safe: it skips finished files and resumes partial ones. The start page rebuilds itself from whatever is installed each time you start the kit. `git pull` gets the newest version of the kit itself.
+Biblioteken uppdaterar sig inte själva. Några gånger om året kan du lägga in nyare filnamn från https://download.kiwix.org/zim/ i `config/libraries.txt` och köra `bash scripts/download-library.sh`. Det är alltid säkert att köra igen: färdiga filer hoppas över och avbrutna fortsätter. Startsidan bygger om sig själv varje gång du startar krislådan. `git pull` (eller en ny nedladdning) ger dig den senaste versionen av själva krislådan.
 
-The map search can be rebuilt from fresh OpenStreetMap data with `scripts/build-map-index.py` (needs `brew install osmium-tool` and `maps/osm/sweden-latest.osm.pbf` from download.geofabrik.de).
+Kartans sökning kan byggas om från färsk OpenStreetMap-data med `scripts/build-map-index.py` (kräver `brew install osmium-tool` och `maps/osm/sweden-latest.osm.pbf` från download.geofabrik.de).
 
-Once a month, turn off Wi-Fi and check that the start page, a search, the map and the AI all still work.
+En gång i månaden: stäng av wifi och kontrollera att startsidan, en sökning, kartan och AI:n fortfarande fungerar.
 
-## Still worth doing by hand
+## Gör också detta
 
-- Install **Organic Maps** on your phone and download Sweden: a second map that runs for days on a power bank.
-- Install **Kiwix** on your phone and copy the medical libraries to it.
-- Buy a battery or crank radio for P4, and a power bank or power station for the Mac.
+- Installera **Organic Maps** på mobilen och ladda ner Sverige: en andra karta som klarar sig i dagar på en powerbank.
+- Installera **Kiwix** på mobilen och kopiera över de medicinska biblioteken.
+- Skaffa en batteri- eller vevradio för P4, och en powerbank eller ett batteripaket för Macen.
 
-## Credits and licence
+## Tack och licenser
 
-The kit's own code is under the MIT licence (`LICENSE`). The libraries, maps, brochures and AI models are downloaded from their original sources and keep their own licences: see `CREDITS.md`. Inspired by [Project N.O.M.A.D.](https://github.com/Crosstalk-Solutions/project-nomad).
+Krislådans egen kod har MIT-licens (`LICENSE`). Biblioteken, kartorna, broschyrerna och AI-modellerna hämtas från sina originalkällor och har sina egna licenser, se `CREDITS.md`. Inspirerad av [Project N.O.M.A.D.](https://github.com/Crosstalk-Solutions/project-nomad).
 
-This kit is not medical advice and does not replace emergency services. In an emergency, call 112.
+Krislådan är inte medicinsk rådgivning och ersätter inte räddningstjänsten. Vid nödsituation, ring 112.
+
+## In English
+
+Krislåda is an offline crisis kit for Sweden on a Mac with Apple Silicon: medical libraries and 29 one-tap emergency topics, a local AI (Ollama and AnythingLLM) that answers in Swedish from the kit's books and can look at photos, an offline map of all of Sweden with search for every town, street and address, and the official Swedish brochure *In case of crisis or war*. Phones on the same Wi-Fi can use it too. Install with the one line above (or download `Krislada.zip` and double-click `Installera Krislåda.command`); it needs about 50 GB and a few hours of downloading, then works with no internet. Sources and licences are in `CREDITS.md`.

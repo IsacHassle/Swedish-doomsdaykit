@@ -1,9 +1,9 @@
 #!/bin/bash
 # Starts the crisis kit: the offline library, the start page, the map, the
 # documents and the AI page, shared with every phone and laptop on the same Wi-Fi.
-# No internet needed. This is what "Start Crisis Kit.command" runs.
+# No internet needed. This is what "Starta Krislåda.command" runs.
 #
-# Run:  bash scripts/share-library.sh
+# Run:  bash scripts/share-library.sh   (this is what "Starta Krislåda.command" runs)
 # Stop: Ctrl+C (stops everything)
 #
 # The first time, macOS may ask whether kiwix-serve and Python may accept
@@ -18,7 +18,7 @@ WEB_PORT=8091
 shopt -s nullglob
 zims=("$LIB"/*.zim)
 if [ ${#zims[@]} -eq 0 ]; then
-  echo "No library files found in $LIB yet. Run download-library.sh first."
+  echo "Inga bibliotek hittades i $LIB. Kör installationen först (Installera Krislåda.command)."
   exit 1
 fi
 
@@ -31,22 +31,22 @@ sleep 1
 LIB_PID=$!
 python3 "$KIT/scripts/serve-web.py" "$WEB_PORT" >/dev/null 2>&1 &
 WEB_PID=$!
-trap 'kill $LIB_PID $WEB_PID 2>/dev/null; echo; echo "  Stopped."' EXIT
+trap 'kill $LIB_PID $WEB_PID 2>/dev/null; echo; echo "  Stoppad."' EXIT
 
 for i in $(seq 1 30); do curl -sf -o /dev/null "http://localhost:$LIB_PORT/catalog/v2/entries" && break; sleep 1; done
 python3 "$KIT/scripts/build-home.py" >/dev/null
 
 IP=$(ipconfig getifaddr en0 || ipconfig getifaddr en1)
 echo ""
-echo "  KRISLÅDA / CRISIS KIT is running (${#zims[@]} libraries)."
+echo "  KRISLÅDA är igång (${#zims[@]} bibliotek)."
 echo ""
-echo "  On this Mac:            http://localhost:$WEB_PORT"
-[ -n "$IP" ] && echo "  On phones (same Wi-Fi): http://$IP:$WEB_PORT"
+echo "  På den här Macen:        http://localhost:$WEB_PORT"
+[ -n "$IP" ] && echo "  På mobiler (samma wifi): http://$IP:$WEB_PORT"
 echo ""
-echo "  Ask the AI:              http://localhost:$WEB_PORT/ai/"
-[ -n "$IP" ] && echo "  Ask the AI from a phone: http://$IP:$WEB_PORT/ai/"
+echo "  Fråga AI:                http://localhost:$WEB_PORT/ai/"
+[ -n "$IP" ] && echo "  Fråga AI från mobilen:   http://$IP:$WEB_PORT/ai/"
 echo ""
-echo "  Keep this window open. Press Ctrl+C to stop."
+echo "  Låt det här fönstret vara öppet. Tryck Ctrl+C för att stänga av."
 echo ""
 [ "${1:-}" = "--open" ] && open "http://localhost:$WEB_PORT"
 wait $LIB_PID
