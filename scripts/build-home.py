@@ -258,7 +258,18 @@ TEMPLATE = r"""<!doctype html>
 <link rel="icon" href="/icon-180.png">
 <link rel="stylesheet" href="lib/kit.css">
 <style>
-  .tools a { font-size: 17px; }
+  .primary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 26px; }
+  .big { position: relative; display: block; padding: 18px 20px 20px; border: 1px solid var(--muted); border-radius: 12px;
+         text-decoration: none; color: var(--fg); background: var(--bg); transition: border-color .15s, transform .15s; }
+  .big:hover { border-color: var(--fg); transform: translateY(-1px); }
+  .big b { display: block; font-size: 23px; font-weight: 650; letter-spacing: -.01em; }
+  .big span { display: block; margin-top: 6px; color: var(--muted); font-size: 15px; line-height: 1.45; max-width: 36ch; }
+  .big i { position: absolute; top: 17px; right: 20px; font-style: normal; font-size: 22px; color: var(--muted); }
+  .big.dark { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .big.dark span, .big.dark i { color: var(--bg); opacity: .72; }
+  .where { margin: 10px 0 0; font-size: 15px; }
+  .where a { text-decoration: none; } .where a:hover { text-decoration: underline; }
+  .where small { margin-left: 6px; }
   form.search { display: flex; gap: 8px; }
   form.search input { flex: 1; min-width: 0; }
   details.more { border-top: 1px solid var(--line); }
@@ -275,6 +286,9 @@ TEMPLATE = r"""<!doctype html>
   details.inline[open] > summary { padding-bottom: 6px; }
   .later { margin-top: 48px; }
   @media (max-width: 560px) {
+    .primary { grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+    .big { padding: 16px 18px; } .big b { font-size: 21px; }
+    .where small { display: block; margin: 2px 0 0; }
     form.search { flex-wrap: wrap; }
     form.search input { flex-basis: 100%; }
     details.more > summary span { display: none; }
@@ -289,19 +303,16 @@ TEMPLATE = r"""<!doctype html>
   <p class="emergency"><strong>Livsfara? Ring 112.</strong><span>1177 sjukvårdsråd · 113&nbsp;13 information vid kris · 114&nbsp;14 polisen · Radio P4</span></p>
   <p class="notice" id="battery" hidden></p>
 
+  <div class="primary">
+    <a class="big dark" href="ai/"><b>Fråga AI</b><span>Fråga på svenska om skador, sjukdom, vatten, mat och värme. Svaret bygger på krislådans böcker.</span><i>→</i></a>
+    <a class="big" href="map/"><b>Karta</b><span>Hela Sverige, utan internet. Sök adress och hitta närmaste sjukhus, apotek och vatten.</span><i>→</i></a>
+  </div>
+  <p class="where"><a href="map/?gps=1">Var är jag? →</a><small>Din position på kartan, med USB GPS-mottagare eller mobilen</small></p>
+
   <section>
     <h2>Akut</h2>
     <ul class="list cols">%EMERGENCY%</ul>
     <details class="inline"><summary>+ Fler akuta ämnen (%MORECOUNT%)</summary><ul class="list cols">%MORE%</ul></details>
-  </section>
-
-  <section>
-    <h2>Verktyg</h2>
-    <ul class="list rows tools">
-      <li><a href="ai/">Fråga AI</a><small>Fråga på svenska. Svaret bygger på krislådans böcker.</small></li>
-      <li><a href="map/">Karta</a><small>Hela Sverige. Sök ort, gata och adress, närmaste sjukhus och apotek.</small></li>
-      <li><a href="map/?gps=1">Var är jag?</a><small>Din position, med en USB GPS-mottagare eller mobilen.</small></li>
-    </ul>
   </section>
 
   <section>
