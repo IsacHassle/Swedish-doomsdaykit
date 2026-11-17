@@ -9,36 +9,27 @@
 <meta name="theme-color" content="#0b5cad">
 <link rel="stylesheet" href="../lib/kit.css">
 <style>
-  main { max-width: 780px; }
-  h1 { font: 800 30px/1.05 var(--cond); text-transform: uppercase; margin: 18px 0 6px; }
-  h2 { font: 700 15px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 24px 0 8px; }
-  .sub { color: var(--muted); }
-  .progress { height: 16px; border: 2px solid var(--ink); background: var(--panel); margin: 10px 0 4px; }
-  .progress div { height: 100%; width: 0; background: repeating-linear-gradient(-45deg, var(--olive) 0 8px, #3d4419 8px 16px); transition: width .3s; }
-  #count { font: 600 14px/1.4 var(--mono); text-transform: uppercase; }
-  ul { list-style: none; padding: 0; margin: 0; border: 2px solid var(--ink); background: var(--panel); }
-  li { border-top: 1px solid var(--ink); } li:first-child { border-top: 0; }
-  label { display: flex; gap: 12px; align-items: flex-start; padding: 11px 14px; cursor: pointer; font-weight: 600; }
-  input[type=checkbox] { appearance: none; width: 24px; height: 24px; margin-top: 1px; flex: none; border: 2px solid var(--ink); background: var(--paper); display: grid; place-content: center; cursor: pointer; }
-  input[type=checkbox]:checked { background: var(--olive); }
-  input[type=checkbox]:checked::after { content: "✓"; color: #f6f2e6; font: 800 17px/1 var(--font); }
+  .page { max-width: 700px; }
+  .progress { height: 4px; background: var(--line); margin: 18px 0 6px; border-radius: 2px; overflow: hidden; }
+  .progress div { height: 100%; width: 0; background: var(--fg); transition: width .3s; }
+  #count { font-size: 13px; color: var(--muted); margin: 0; }
+  h2 { margin-top: 28px; }
+  ul { list-style: none; padding: 0; margin: 0; }
+  li { border-bottom: 1px solid var(--line); }
+  label { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; cursor: pointer; }
+  input[type=checkbox] { width: 18px; height: 18px; margin-top: 3px; flex: none; accent-color: var(--fg); }
   li.done span { color: var(--muted); text-decoration: line-through; }
-  .src { color: var(--muted); font: 500 12px/1.5 var(--mono); margin-top: 8px; }
-  @media print { .bar, button, .topbar, .hazard { display: none; } body { background: #fff; } }
+  .src { color: var(--muted); font-size: 12.5px; margin-top: 8px; }
+  @media print { button, .back { display: none; } }
 </style>
 </head>
-<header class="topbar"><div class="wrap">
-  <a class="back" href="/">← Krislåda</a>
-  <span class="logo" style="font-size:26px">Checklista</span>
-  <div class="meta">Hemberedskap<br>en vecka</div>
-</div></header>
-<div class="hazard"></div>
 <body>
-<main>
+<main class="page">
+  <a class="back" href="/">← Krislåda</a>
   <h1>Checklista för hemberedskap</h1>
-  <p class="sub">Bocka av det du har hemma. Målet är att klara dig själv i minst en vecka. Bockarna sparas i den här webbläsaren.</p>
+  <p class="meta">Bocka av det du har hemma. Målet är att klara dig själv i minst en vecka. Bockarna sparas i den här webbläsaren.</p>
   <div class="progress"><div id="bar"></div></div>
-  <p class="sub" id="count"></p>
+  <p id="count"></p>
 
   <h2>Hemma (MCF)</h2>
   <ul id="mcf"><li><label>Laddar…</label></li></ul>
@@ -47,7 +38,7 @@
   <h2>Krislådan</h2>
   <ul id="kit"></ul>
 
-  <p style="margin:18px 0 30px; display:flex; gap:8px"><button class="btn ghost" onclick="print()">Skriv ut</button><button class="btn ghost" id="reset">Börja om</button></p>
+  <p style="margin:18px 0 30px; display:flex; gap:8px"><button class="plain" onclick="print()">Skriv ut</button><button class="plain" id="reset">Börja om</button></p>
 </main>
 <script src="../lib/md.js"></script>
 <script>

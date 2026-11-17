@@ -12,78 +12,72 @@
 <link rel="icon" href="/icon-180.png">
 <link rel="stylesheet" href="../lib/kit.css">
 <style>
-  main { max-width: 900px; }
-  .modes { display: grid; grid-template-columns: repeat(3, 1fr); border: 2px solid var(--ink); margin: 14px 0 16px; }
-  .mode { position: relative; display: block; padding: 10px 12px; cursor: pointer; background: var(--panel); border-right: 2px solid var(--ink); }
-  .mode:last-child { border-right: 0; }
+  .page { max-width: 760px; }
+  .modes { display: flex; gap: 22px; margin: 22px 0 6px; border-bottom: 1px solid var(--line); }
+  .mode { cursor: pointer; padding: 8px 0; margin-bottom: -1px; color: var(--muted); border-bottom: 2px solid transparent; font-weight: 500; }
   .mode input { position: absolute; opacity: 0; pointer-events: none; }
-  .mode b { display: block; font: 800 20px/1.05 var(--cond); text-transform: uppercase; }
-  .mode span { display: block; margin-top: 4px; font: 500 14px/1.35 var(--font); color: var(--muted); }
-  .mode .k { font: 600 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
-  .mode:has(input:checked) { background: var(--ink); color: var(--paper); }
-  .mode:has(input:checked) span, .mode:has(input:checked) .k { color: #c9c2ac; }
+  .mode:has(input:checked) { color: var(--fg); border-bottom-color: var(--fg); }
   .mode:has(input:disabled) { opacity: .4; cursor: not-allowed; }
-  .mode:has(input:focus-visible) { outline: 3px solid var(--orange); outline-offset: -3px; }
-  #status { margin: 10px 0 2px; }
-  #fix { font-weight: 600; color: var(--red); margin: 4px 0; }
-  #log { display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
-  .msg { scroll-margin-top: 12px; overflow-wrap: anywhere; }
-  .me { align-self: flex-end; max-width: 85%; white-space: pre-wrap; background: var(--ink); color: var(--paper); padding: 10px 14px; font-weight: 600; }
-  .me img { display: block; max-width: 220px; max-height: 220px; margin-top: 8px; border: 2px solid var(--paper); }
-  .ai { background: var(--panel); border: 2px solid var(--ink); border-left: 8px solid var(--orange); padding: 10px 16px; }
+  .mode:has(input:focus-visible) { outline: 2px solid var(--fg); outline-offset: 2px; }
+  #modehint { font-size: 14px; color: var(--muted); margin: 6px 0 0; }
+  #status { margin-top: 14px; }
+  #fix { color: var(--red); font-size: 14px; margin: 6px 0 0; }
+  #log { display: flex; flex-direction: column; gap: 18px; margin: 26px 0 16px; }
+  .msg { scroll-margin-top: 16px; overflow-wrap: anywhere; }
+  .me { align-self: flex-end; max-width: 85%; white-space: pre-wrap; background: var(--soft); padding: 9px 13px; border-radius: 10px; }
+  .me img { display: block; max-width: 220px; max-height: 220px; margin-top: 8px; border-radius: 6px; }
+  .ai { padding-left: 14px; border-left: 2px solid var(--line); }
   .ai p, .ai ul, .ai ol { margin: 6px 0; } .ai ul, .ai ol { padding-left: 22px; } .ai li { margin: 3px 0; }
-  .ai h4 { margin: 12px 0 4px; font: 800 19px/1.1 var(--cond); text-transform: uppercase; }
-  .ai table { border-collapse: collapse; margin: 8px 0; font-size: 15px; display: block; overflow-x: auto; }
-  .ai td, .ai th { border: 1px solid var(--ink); padding: 4px 8px; text-align: left; vertical-align: top; }
-  .meta { font: 600 12px/1.4 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
-  .wait { font: 600 14px/1.4 var(--mono); text-transform: uppercase; color: var(--muted); }
-  .src { margin-top: 8px; padding-top: 8px; border-top: 2px dashed var(--ink); font: 600 13px/1.6 var(--mono); }
-  .src a, .src span { display: inline-block; margin-right: 14px; }
-  .sep { font: 600 12px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); text-align: center; }
-  .err { color: var(--red); font-weight: 700; }
-  form#ask { position: sticky; bottom: 0; background: var(--paper); padding: 10px 0 12px; border-top: 3px solid var(--ink); }
-  textarea { width: 100%; resize: vertical; min-height: 70px; font-size: 18px; }
+  .ai h4 { margin: 14px 0 4px; font-size: 16px; }
+  .ai table { border-collapse: collapse; margin: 8px 0; font-size: 14px; display: block; overflow-x: auto; }
+  .ai td, .ai th { border: 1px solid var(--line); padding: 4px 8px; text-align: left; vertical-align: top; }
+  .meta { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+  .wait { color: var(--muted); font-size: 15px; }
+  .src { margin-top: 10px; font-size: 13.5px; color: var(--muted); }
+  .src a, .src span { display: inline-block; margin-right: 12px; color: var(--muted); }
+  .sep { font-size: 13px; color: var(--muted); text-align: center; }
+  .err { color: var(--red); }
+  form#ask { position: sticky; bottom: 0; background: var(--bg); padding: 10px 0 14px; border-top: 1px solid var(--line); }
+  textarea { width: 100%; resize: vertical; min-height: 64px; }
   .row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
   .row .grow { flex: 1; }
-  .btn input { display: none; }
-  .btn.stop { background: var(--red); border-color: var(--red); color: #fff; }
+  label.button input { display: none; }
+  button.stop { background: var(--red); border-color: var(--red); color: #fff; }
   #thumbs { display: flex; gap: 6px; flex-wrap: wrap; }
-  #thumbs div { position: relative; } #thumbs img { width: 64px; height: 64px; object-fit: cover; border: 2px solid var(--ink); }
-  #thumbs button { position: absolute; top: -8px; right: -8px; font: 700 13px/1 var(--mono); padding: 3px 6px; background: var(--ink); color: var(--paper); border: 0; cursor: pointer; }
-  #examples { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
-  #examples button { text-align: left; font: 600 15px/1.35 var(--font); color: var(--ink); background: var(--panel); border: 2px solid var(--ink); border-left: 6px solid var(--olive); padding: 9px 11px; cursor: pointer; }
-  #examples button:hover { background: var(--paper); }
-  .guide ol > li { margin: 10px 0; }
-  .guide table { border-collapse: collapse; width: 100%; font-size: 15px; margin: 8px 0; }
-  .guide td, .guide th { border: 2px solid var(--ink); padding: 6px 8px; text-align: left; vertical-align: top; background: var(--panel); }
-  .guide th { background: var(--ink); color: var(--paper); font: 700 14px/1.2 var(--mono); text-transform: uppercase; }
-  .example { background: var(--panel); border: 2px dashed var(--ink); padding: 8px 10px; font-size: 15px; margin-top: 6px; }
-  details.guide summary { cursor: pointer; font: 700 15px/1 var(--mono); text-transform: uppercase; letter-spacing: .05em; padding: 6px 0; }
-  @media (max-width: 560px) {
-    .modes { grid-template-columns: repeat(3, 1fr); }
-    .mode { padding: 8px 6px; text-align: center; } .mode span, .mode .k { display: none; } .mode b { font-size: 16px; }
-    .long { display: none; } .btn { padding: 11px 12px; font-size: 15px; }
-  }
+  #thumbs div { position: relative; } #thumbs img { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; }
+  #thumbs button { position: absolute; top: -8px; right: -8px; font-size: 12px; padding: 2px 6px; border-radius: 10px; }
+  details.more { border-top: 1px solid var(--line); }
+  details.more:last-of-type { border-bottom: 1px solid var(--line); }
+  details.more > summary { list-style: none; cursor: pointer; padding: 14px 0; display: flex; justify-content: space-between; font-weight: 600; }
+  details.more > summary::-webkit-details-marker { display: none; }
+  details.more > summary::after { content: "+"; color: var(--muted); font-weight: 400; }
+  details.more[open] > summary::after { content: "–"; }
+  details.more > .inner { padding: 0 0 20px; }
+  #examples { list-style: none; margin: 0; padding: 0; }
+  #examples button { display: block; width: 100%; text-align: left; background: none; color: var(--fg); border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 9px 0; font-size: 15px; }
+  #examples button:hover { text-decoration: underline; }
+  .guide ol { padding-left: 20px; } .guide ol > li { margin: 10px 0; }
+  .guide table { border-collapse: collapse; width: 100%; font-size: 14px; margin: 8px 0; }
+  .guide td, .guide th { border-bottom: 1px solid var(--line); padding: 6px 8px 6px 0; text-align: left; vertical-align: top; }
+  .example { color: var(--muted); font-size: 15px; margin-top: 4px; }
+  @media (max-width: 560px) { .long { display: none; } .modes { gap: 16px; } }
 </style>
 </head>
 <body>
-<header class="topbar"><div class="wrap">
+<main class="page">
   <a class="back" href="../">← Krislåda</a>
-  <span class="logo" style="font-size:26px">Fråga AI</span>
-  <div class="meta">Körs på den här Macen<br>utan internet</div>
-</div></header>
-<div class="hazard"></div>
-<main>
-  <div class="warn" style="border-left-color: var(--red)"><b>Livsfara? Ring 112.</b> Vänta inte på AI:n vid andningsstopp eller kraftig blödning: öppna <a href="../">Akut</a> på startsidan. AI kan ha fel, kontrollera i källan.</div>
+  <h1>Fråga AI</h1>
+  <p class="meta">Körs på den här datorn, utan internet. Livsfara? Ring 112 först, och använd Akut på startsidan.</p>
 
   <div id="status" class="lamps">Kontrollerar AI:n…</div>
   <div id="fix"></div>
 
   <div class="modes" role="radiogroup" aria-label="Välj läge">
-    <label class="mode"><input type="radio" name="mode" value="books"><span class="k">Läge A · 10–40 s</span><b>Ur böckerna</b><span>Söker i krislådans böcker och visar källan. Bäst för det mesta.</span></label>
-    <label class="mode"><input type="radio" name="mode" value="crisis"><span class="k">Läge B · 5–20 s</span><b>Snabbt svar</b><span>Samma stora AI, utan böckerna. Kan titta på foton.</span></label>
-    <label class="mode"><input type="radio" name="mode" value="crisis-small"><span class="k">Läge C · lite ström</span><b>Spara batteri</b><span>Mindre AI som drar mindre ström. Enklare svar, tar foton.</span></label>
+    <label class="mode" data-hint="Söker i krislådans böcker och visar källan. 10 till 40 sekunder."><input type="radio" name="mode" value="books">Ur böckerna</label>
+    <label class="mode" data-hint="Samma AI utan böckerna. Snabbare, och kan titta på foton."><input type="radio" name="mode" value="crisis">Snabbt svar</label>
+    <label class="mode" data-hint="Mindre AI som drar mindre ström. Enklare svar."><input type="radio" name="mode" value="crisis-small">Spara batteri</label>
   </div>
+  <p id="modehint"></p>
 
   <div id="log" aria-live="polite"></div>
 
@@ -91,64 +85,48 @@
     <div id="thumbs"></div>
     <textarea id="q" rows="3" placeholder="Beskriv läget: vem (ålder), vad hände, när, vad du ser och vad du har hemma." aria-label="Din fråga"></textarea>
     <div class="row">
-      <label class="btn ghost" title="Bifoga foto (Snabbt svar eller Spara batteri)">Foto<input id="photo" type="file" accept="image/*" multiple></label>
-      <button type="button" class="btn ghost" id="new">Ny<span class="long"> konversation</span></button>
+      <label class="button plain" title="Bifoga foto">Foto<input id="photo" type="file" accept="image/*" multiple></label>
+      <button type="button" class="plain" id="new">Ny<span class="long"> konversation</span></button>
       <span class="grow"></span>
-      <button type="submit" id="send" class="btn go">Skicka</button>
+      <button type="submit" id="send">Skicka</button>
     </div>
   </form>
 
-  <div class="sec"><span class="num">01</span><h2>Prova att fråga</h2></div>
-  <div id="examples">
-    <button type="button">Någon har bränt handen på spisen. Vad gör jag nu?</button>
-    <button type="button">Hur renar jag vatten om kranvattnet inte går att dricka?</button>
-    <button type="button">Ett barn på 4 år har haft 39,5 graders feber i två dagar. När måste vi söka vård?</button>
-    <button type="button">Elen har varit borta i ett dygn och det är minus 10 ute. Hur håller vi lägenheten varm på ett säkert sätt?</button>
-    <button type="button">Vad betyder signalen Viktigt meddelande till allmänheten och vad ska jag göra när jag hör den?</button>
-    <button type="button">Vad behöver vi hemma för att klara en vecka utan el och vatten? Vi är två vuxna och ett barn.</button>
-    <button type="button">Hur lagar jag mat säkert utan el?</button>
-    <button type="button" data-photo="1">Vad är det här? Bifoga ett foto av ett sår, utslag, en växt eller en trasig sak</button>
-  </div>
+  <section>
+    <details class="more"><summary>Exempel på frågor</summary><div class="inner">
+      <div id="examples">
+        <button type="button">Någon har bränt handen på spisen. Vad gör jag nu?</button>
+        <button type="button">Hur renar jag vatten om kranvattnet inte går att dricka?</button>
+        <button type="button">Ett barn på 4 år har haft 39,5 graders feber i två dagar. När måste vi söka vård?</button>
+        <button type="button">Elen har varit borta i ett dygn och det är minus 10 ute. Hur håller vi lägenheten varm på ett säkert sätt?</button>
+        <button type="button">Vad betyder signalen Viktigt meddelande till allmänheten och vad ska jag göra när jag hör den?</button>
+        <button type="button">Vad behöver vi hemma för att klara en vecka utan el och vatten? Vi är två vuxna och ett barn.</button>
+        <button type="button">Hur lagar jag mat säkert utan el?</button>
+        <button type="button" data-photo="1">Vad är det här? (bifoga ett foto av ett sår, utslag, en växt eller en trasig sak)</button>
+      </div>
+    </div></details>
+    <details class="more guide"><summary>Så använder du AI:n</summary><div class="inner">
+      <ol>
+        <li><b>Välj läge.</b> <i>Ur böckerna</i> för det mesta: svaret bygger på krislådans böcker och du ser källorna under svaret. <i>Snabbt svar</i> när det är bråttom eller för foton. <i>Spara batteri</i> när datorn går på batteri.</li>
+        <li><b>Skriv som när du ringer 1177.</b> Vem (ålder, vikt för barn), vad som hände, när, vad du ser och vad du har hemma.
+          <div class="example">Exempel: Min pappa är 72 år. Han föll i trappan för 20 minuter sedan och slog i huvudet. Han blöder lite från pannan och verkar förvirrad. Vi har plåster, kompresser och Alvedon. Vad ska vi göra?</div></li>
+        <li><b>Fortsätt fråga.</b> AI:n minns samtalet. Tryck <i>Ny konversation</i> när du byter ämne.</li>
+        <li><b>Kontrollera det viktiga.</b> AI kan ha fel. Öppna källan under svaret, särskilt för doser. Ät aldrig en svamp eller växt för att AI:n säger att den är ätlig.</li>
+        <li><b>Foto.</b> Tryck <i>Foto</i> (byter till Snabbt svar). Bra ljus, nära, en sak per bild.</li>
+        <li><b>Prata i stället för att skriva.</b> Datorns diktering (mikrofontangenten, eller Fn två gånger), eller mikrofonen på mobilens tangentbord.</li>
+        <li><b>Från mobilen.</b> Samma wifi som datorn, öppna <b id="lanurl">adressen som Terminal-fönstret visar</b>.</li>
+        <li><b>Om det inte fungerar.</b> Raden högst upp visar vad som är igång. Öppna appen Ollama för AI-motorn eller AnythingLLM för böckerna. Hjälper inget: dubbelklicka <i>Starta Krislåda.command</i> igen.</li>
+      </ol>
+      <h3>Andra sätt på datorn</h3>
+      <table>
+        <tr><td>AnythingLLM, arbetsytan Crisis</td><td>Samma som Ur böckerna. Där finns tidigare samtal, och du kan dra in egna filer.</td></tr>
+        <tr><td>Ollama, modellen crisis</td><td>Samma som Snabbt svar. Dra in ett foto för att fråga om det.</td></tr>
+        <tr><td>Terminal</td><td><code>ollama run crisis</code>, avsluta med <code>/bye</code>.</td></tr>
+      </table>
+    </div></details>
+  </section>
 
-  <div class="sec"><span class="num">02</span><h2>Så använder du AI:n</h2></div>
-  <details class="guide" open>
-    <summary>Visa eller dölj guiden</summary>
-    <ol>
-      <li><b>Välj läge.</b>
-        <table>
-          <tr><th>Läge</th><th>Använd när</th></tr>
-          <tr><td><b>A · Ur böckerna</b></td><td>Det mesta: skador, sjukdom, läkemedel, vatten, mat, värme, vad myndigheterna råder. Svaret bygger på kitets böcker (sjukvårdsböcker, NHS läkemedelsfakta, vattenrening, matlagning, MSB-broschyren, Ready.gov om strålning, kemolyckor och elavbrott) och du ser vilka böcker under svaret. Kräver att appen AnythingLLM är igång.</td></tr>
-          <tr><td><b>B · Snabbt svar</b></td><td>När det är bråttom, eller när du vill visa ett <b>foto</b>. Samma stora AI-modell, men den läser inte i böckerna.</td></tr>
-          <tr><td><b>C · Spara batteri</b></td><td>När Macen går på batteri och du inte vet när du kan ladda. Mindre modell, enklare svar.</td></tr>
-        </table>
-      </li>
-      <li><b>Skriv som när du ringer 1177.</b> Berätta vem (ålder, vikt för barn), vad som hände, när, vad du ser och vad du har hemma. Ju mer, desto bättre svar.
-        <div class="example">Exempel: <i>Min pappa är 72 år. Han föll i trappan för 20 minuter sedan och slog i huvudet. Han blöder lite från pannan och verkar förvirrad. Vi har plåster, kompresser och Alvedon. Vad ska vi göra?</i></div>
-      </li>
-      <li><b>Fortsätt fråga.</b> AI:n minns samtalet: fråga till exempel <i>Vad gör jag om det blir värre?</i> eller <i>Förklara steg 3 enklare.</i> Tryck <b>Ny konversation</b> när du byter ämne.</li>
-      <li><b>Kontrollera viktiga saker.</b> AI kan ha fel. Under svar ur böckerna finns källorna: tryck för att öppna boken. Lita aldrig blint på doser, och ät aldrig en svamp eller växt bara för att AI:n säger att den är ätlig.</li>
-      <li><b>Foto.</b> Tryck <b>Foto</b> (byter till Snabbt svar). Ta bilden i bra ljus, nära, en sak per bild, och skriv vad du undrar.</li>
-      <li><b>Prata i stället för att skriva.</b> På Macen: tryck på mikrofontangenten (🎤), eller Fn två gånger, och prata. På mobilen: tryck på mikrofonen på tangentbordet.</li>
-      <li><b>Från mobilen.</b> Anslut mobilen till samma wifi som Macen och öppna <b id="lanurl">adressen som Terminal-fönstret visar</b>. Macen gör jobbet, så håll den laddad.</li>
-      <li><b>Spara ström.</b> AI:n drar mycket ström medan den svarar. Ställ få och tydliga frågor, välj <b>Spara batteri</b> och stäng andra appar.</li>
-      <li><b>Om det inte fungerar.</b> Raden högst upp visar vad som är igång.
-        <ul>
-          <li>"AI-motorn är inte igång": öppna appen <b>Ollama</b> (i Program) och vänta tio sekunder.</li>
-          <li>"Böckerna är inte igång": öppna appen <b>AnythingLLM</b> och vänta tills den har startat helt.</li>
-          <li>Första svaret efter start tar längre tid, eftersom AI:n laddas in i minnet.</li>
-          <li>Hjälper inget: stäng Terminal-fönstret och dubbelklicka <b>Starta Krislåda.command</b> igen.</li>
-        </ul>
-      </li>
-    </ol>
-    <h3 class="sub">Andra sätt att använda AI:n på Macen</h3>
-    <table>
-      <tr><td><b>AnythingLLM</b>-appen, arbetsytan <b>Crisis</b></td><td>Samma böcker som läge A här. Där finns också dina tidigare samtal, och du kan dra in egna filer (läkemedelslistor, manualer) så att AI:n kan svara ur dem.</td></tr>
-      <tr><td><b>Ollama</b>-appen, modellen <b>crisis</b> eller <b>crisis-small</b></td><td>Samma som läge B och C här. Dra in ett foto i rutan för att fråga om det.</td></tr>
-      <tr><td>I Terminal</td><td><code>ollama run crisis</code> och skriv din fråga. Avsluta med <code>/bye</code>.</td></tr>
-    </table>
-  </details>
-
-  <footer class="kit">KRISLÅDA · AI-modeller: Gemma 4 26B (crisis), Gemma 4 E4B (crisis-small) · sökning i böckerna: AnythingLLM och bge-m3</footer>
+  <footer class="kit">AI-modeller: Gemma 4 26B och E4B. Sökning i böckerna: AnythingLLM och bge-m3.</footer>
 </main>
 
 <script>
@@ -187,6 +165,7 @@
     const input = document.querySelector(`input[name=mode][value="${m}"]`);
     if (!input || input.disabled) return false;
     input.checked = true;
+    $('#modehint').textContent = input.closest('label').dataset.hint || '';
     if (mode && mode !== m && log.children.length && !quiet) {
       add('div', 'sep', 'Nytt läge: ' + LABEL[m] + '. AI:n börjar om utan det tidigare samtalet.');
     }
@@ -298,7 +277,7 @@
     const paint = () => { const v = visible(raw); if (v) { shown = true; box.innerHTML = md(v); } };
 
     const ctrl = new AbortController();
-    busy = ctrl; sendBtn.textContent = 'Stopp'; sendBtn.className = 'btn stop';
+    busy = ctrl; sendBtn.textContent = 'Stopp'; sendBtn.className = 'stop';
     try {
       if (used === 'books') {
         if (!thread) {
@@ -334,7 +313,7 @@
       if (used === 'books' && e.message === 'books') thread = null;
     } finally {
       clearInterval(tick);
-      busy = null; sendBtn.textContent = 'Skicka'; sendBtn.className = 'btn go';
+      busy = null; sendBtn.textContent = 'Skicka'; sendBtn.className = '';
     }
 
     if (!visible(raw)) box.innerHTML = '';

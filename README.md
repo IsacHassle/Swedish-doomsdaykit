@@ -81,13 +81,13 @@ Nummer: **112** nödsituation · **1177** sjukvårdsrådgivning · **113 13** in
 
 AI:n körs helt på Macen. Öppna den från startsidan: **Fråga AI** (eller direkt på http://localhost:8091/ai/). Samma sida fungerar på familjens mobiler på wifi:t.
 
-1. **Välj läge** högst upp på sidan:
+1. **Välj läge** under rubriken (flikarna Ur böckerna, Snabbt svar och Spara batteri):
 
     | Läge | Använd när | Tid |
     |---|---|---|
-    | **A · Ur böckerna** | Det mesta: skador, sjukdom, läkemedel, vatten, mat, värme, myndigheternas råd. Den läser krislådans böcker (1177, MCF och Livsmedelsverket på svenska, sjukvårdsböcker, NHS läkemedelsfakta, vattenrening, mat, MCF-broschyren, Ready.gov-guiderna) och visar vilka böcker svaret bygger på. Tryck på en för att öppna den | Cirka 10 till 40 s |
-    | **B · Snabbt svar** | När det är bråttom, eller för att fråga om ett **foto**. Samma stora AI, utan böckerna | Cirka 5 till 20 s |
-    | **C · Spara batteri** | När Macen går på batteri och du inte vet när du kan ladda. Mindre AI, enklare svar, tar också foton | Snabbare, lättare |
+    | **Ur böckerna** | Det mesta: skador, sjukdom, läkemedel, vatten, mat, värme, myndigheternas råd. Den läser krislådans böcker (1177, MCF och Livsmedelsverket på svenska, sjukvårdsböcker, NHS läkemedelsfakta, vattenrening, mat, MCF-broschyren, Ready.gov-guiderna) och visar vilka böcker svaret bygger på. Tryck på en för att öppna den | Cirka 10 till 40 s |
+    | **Snabbt svar** | När det är bråttom, eller för att fråga om ett **foto**. Samma stora AI, utan böckerna | Cirka 5 till 20 s |
+    | **Spara batteri** | När Macen går på batteri och du inte vet när du kan ladda. Mindre AI, enklare svar, tar också foton | Snabbare, lättare |
 
 2. **Skriv som när du ringer 1177.** Vem (ålder, vikt för barn), vad som hände, när, vad du ser, vad du har hemma. Exempel: *Min pappa är 72 år. Han föll i trappan för 20 minuter sedan och slog i huvudet. Han blöder lite från pannan och verkar förvirrad. Vi har plåster, kompresser och Alvedon. Vad ska vi göra?*
 3. **Fortsätt fråga.** Den minns samtalet ("Vad gör jag om det blir värre?", "Förklara steg 3 enklare"). Tryck **Ny konversation** när du byter ämne.
@@ -103,9 +103,9 @@ Livsfara går först: ring **112** om någon telefon fungerar, och använd **Aku
 
 | Var | Modell | När |
 |---|---|---|
-| Appen **AnythingLLM**, arbetsytan **Crisis** | Gemma 4 26B via Ollama | Samma som läge A. Visar också tidigare samtal (även de från AI-sidan), och du kan dra in egna filer |
-| Appen **Ollama**, modellen **crisis** | Gemma 4 26B med krisinstruktionerna inbyggda | Samma som läge B. Dra in ett foto i rutan för att fråga om det |
-| Appen **Ollama**, modellen **crisis-small** | Gemma 4 E4B, samma instruktioner | Samma som läge C |
+| Appen **AnythingLLM**, arbetsytan **Crisis** | Gemma 4 26B via Ollama | Samma som Ur böckerna. Visar också tidigare samtal (även de från AI-sidan), och du kan dra in egna filer |
+| Appen **Ollama**, modellen **crisis** | Gemma 4 26B med krisinstruktionerna inbyggda | Samma som Snabbt svar. Dra in ett foto i rutan för att fråga om det |
+| Appen **Ollama**, modellen **crisis-small** | Gemma 4 E4B, samma instruktioner | Samma som Spara batteri |
 | Terminal: `ollama run crisis` | | Skriv frågan, `/bye` för att avsluta |
 
 Instruktionerna som AI:n följer finns i `config/AI-PROMPT.txt`.

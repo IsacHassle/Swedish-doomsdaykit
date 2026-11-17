@@ -40,6 +40,9 @@ SWEDISH = {
     'Potassium_iodide': 'MCF - Varning kring Sveriges kärnkraftverk',
 }
 SV_DIR = "library/Svenska myndigheter"
+# The emergency topics shown straight away; the rest are one tap away under "Fler".
+FIRST = ["Cardiopulmonary_resuscitation", "Bleeding", "Choking", "Shock_(circulatory)", "Burn",
+         "Hypothermia", "Anaphylaxis", "Poisoning", "Carbon_monoxide_poisoning"]
 EMERGENCY = [
     ("Hjärt-lungräddning", "CPR", "Cardiopulmonary_resuscitation"),
     ("Kraftig blödning", "Severe bleeding", "Bleeding"),
@@ -184,46 +187,50 @@ def main():
             src, title = name[:-3].split(" - ", 1)
             advice.setdefault(src, []).append((title, swedish_page(name[:-3])))
     advice_html = "".join(
-        f'<h3 class="sub">{html.escape(ADVICE_NAMES.get(src, src))}</h3><div class="tabs plain">'
-        + "".join(f'<a class="tab" href="{href}"><b>{html.escape(t)}</b></a>' for t, href in items) + "</div>"
+        f'<h3>{html.escape(ADVICE_NAMES.get(src, src))}</h3><ul class="list cols">'
+        + "".join(f'<li><a href="{href}">{html.escape(t)}</a></li>' for t, href in items) + "</ul>"
         for src, items in sorted(advice.items(), key=lambda kv: ADVICE_ORDER.index(kv[0]) if kv[0] in ADVICE_ORDER else 99))
+    advice_count = sum(len(v) for v in advice.values())
 
     books_html = []
     for label, desc, rel in BOOKS:
         if os.path.exists(os.path.join(DOCS, rel)):
             href = "docs/" + "/".join(urllib.request.quote(p) for p in rel.split("/"))
-            books_html.append(f'<a class="tile" href="{href}"><span class="k">PDF · bok {len(books_html) + 1:02d}</span>'
-                              f'<b>{html.escape(label)}</b><span class="d">{html.escape(desc)}</span></a>')
+            books_html.append(f'<li><a href="{href}">{html.escape(label)}</a><small>{html.escape(desc)}</small></li>')
 
     groups_html = []
     shown = set()
     for heading, items in GROUPS:
-        cards = []
+        rows = []
         for prefix, desc in items:
             b = by_prefix(prefix)
             if not b:
                 continue
             shown.add(b["name"])
-            cards.append(f'<a class="tile" data-k="/viewer#{b["name"]}"><span class="k">Bibliotek</span>'
-                         f'<b>{html.escape(b["title"])}</b><span class="d">{html.escape(desc)}</span></a>')
-        if cards:
-            groups_html.append(f'<h3 class="sub">{html.escape(heading)}</h3><div class="tiles">{"".join(cards)}</div>')
+            rows.append(f'<li><a data-k="/viewer#{b["name"]}">{html.escape(b["title"])}</a><small>{html.escape(desc)}</small></li>')
+        if rows:
+            groups_html.append(f'<h3>{html.escape(heading)}</h3><ul class="list rows">{"".join(rows)}</ul>')
     extra = [b for b in books if b["name"] not in shown]
     if extra:
-        cards = "".join(f'<a class="tile" data-k="/viewer#{b["name"]}"><span class="k">Bibliotek</span><b>{html.escape(b["title"])}</b>'
-                        f'<span class="d">{html.escape(b["name"])}</span></a>' for b in extra)
-        groups_html.append(f'<h3 class="sub">Övrigt</h3><div class="tiles">{cards}</div>')
+        rows = "".join(f'<li><a data-k="/viewer#{b["name"]}">{html.escape(b["title"])}</a><small>{html.escape(b["name"])}</small></li>' for b in extra)
+        groups_html.append(f'<h3>Övrigt</h3><ul class="list rows">{rows}</ul>')
 
-    emergency_html = "".join(
-        (f'<div class="tab"><a class="main" href="{sv_href}"><b>{html.escape(sv)}</b><span class="src">{html.escape(sv_src)}</span></a>'
-         f'<a class="en" data-k="{html.escape(k)}">På engelska: {html.escape(en)}</a></div>')
-        if sv_href else
-        f'<a class="tab" data-k="{html.escape(k)}"><b>{html.escape(sv)}</b><span class="src">WikiMed · engelska</span></a>'
-        for sv, en, k, (sv_href, sv_src) in emergency)
+    def topic(sv, en, k, sv_href, sv_src):
+        if sv_href:
+            return f'<li><a href="{sv_href}">{html.escape(sv)}</a><small>{html.escape(sv_src)}</small></li>'
+        return f'<li><a data-k="{html.escape(k)}">{html.escape(sv)}</a><small>engelska</small></li>'
+    first = [e for e in emergency if e[2].rsplit("/", 1)[-1] in FIRST]
+    first.sort(key=lambda e: FIRST.index(e[2].rsplit("/", 1)[-1]))
+    rest = [e for e in emergency if e not in first]
+    emergency_html = "".join(topic(sv, en, k, *svp) for sv, en, k, svp in first)
+    more_html = "".join(topic(sv, en, k, *svp) for sv, en, k, svp in rest)
 
     page = TEMPLATE
     for key, val in {
-        "%EMERGENCY%": emergency_html or "<p>Starta delningen så att biblioteket är igång.</p>",
+        "%EMERGENCY%": emergency_html or "<li>Starta Krislådan så att biblioteken är igång.</li>",
+        "%MORE%": more_html,
+        "%MORECOUNT%": str(len(rest)),
+        "%ADVICECOUNT%": str(advice_count),
         "%ADVICE%": advice_html or "<p>Kör installationen för att hämta myndigheternas råd.</p>",
         "%BOOKS%": "".join(books_html),
         "%GROUPS%": "".join(groups_html) or "<p>Inga bibliotek hittades. Kör share-library.sh.</p>",
@@ -248,69 +255,80 @@ TEMPLATE = r"""<!doctype html>
 <link rel="apple-touch-icon" href="/icon-180.png">
 <meta name="apple-mobile-web-app-title" content="Krislåda">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#161512">
 <link rel="icon" href="/icon-180.png">
 <link rel="stylesheet" href="lib/kit.css">
 <style>
-  form.search { display: flex; gap: 8px; flex-wrap: wrap; }
-  form.search input { flex: 1 1 280px; }
+  .tools a { font-size: 17px; }
+  form.search { display: flex; gap: 8px; }
+  form.search input { flex: 1; min-width: 0; }
+  details.more { border-top: 1px solid var(--line); }
+  details.more:last-of-type { border-bottom: 1px solid var(--line); }
+  details.more > summary { list-style: none; cursor: pointer; padding: 14px 0; display: flex; justify-content: space-between; gap: 12px; }
+  details.more > summary::-webkit-details-marker { display: none; }
+  details.more > summary b { font-weight: 600; }
+  details.more > summary span { color: var(--muted); font-size: 14px; margin-left: auto; }
+  details.more > summary::after { content: "+"; color: var(--muted); width: 14px; text-align: right; }
+  details.more[open] > summary::after { content: "–"; }
+  details.more > .inner { padding: 0 0 22px; }
+  details.inline > summary { list-style: none; cursor: pointer; color: var(--muted); font-size: 14px; padding: 10px 0 0; }
+  details.inline > summary::-webkit-details-marker { display: none; }
+  details.inline[open] > summary { padding-bottom: 6px; }
+  .later { margin-top: 48px; }
+  @media (max-width: 560px) {
+    form.search { flex-wrap: wrap; }
+    form.search input { flex-basis: 100%; }
+    details.more > summary span { display: none; }
+  }
 </style>
 </head>
 <body>
-<header class="topbar"><div class="wrap">
-  <a class="logo" href="./">Krislåda<small>SVERIGE · OFFLINE</small></a>
-  <div class="meta"><span id="clock"></span><br>%COUNT% bibliotek · karta · AI</div>
-</div></header>
-<div class="hazard"></div>
+<main class="page">
+  <h1>Krislåda</h1>
+  <p class="meta">Fungerar utan internet · %COUNT% bibliotek · <span id="clock"></span></p>
 
-<main>
-  <div class="danger">
-    <div class="body">
-      <div class="call">Livsfara? <b>Ring 112</b></div>
-      <div class="nums">
-        <span><b>112</b>nödsituation</span>
-        <span><b>1177</b>sjukvårdsråd</span>
-        <span><b>113&nbsp;13</b>information vid kris</span>
-        <span><b>114&nbsp;14</b>polisen, ej akut</span>
-        <span>Radio: <b>P4</b></span>
-      </div>
-    </div>
-  </div>
-  <div class="warn" id="battery" hidden></div>
+  <p class="emergency"><strong>Livsfara? Ring 112.</strong><span>1177 sjukvårdsråd · 113&nbsp;13 information vid kris · 114&nbsp;14 polisen · Radio P4</span></p>
+  <p class="notice" id="battery" hidden></p>
 
-  <div class="sec"><span class="num">01</span><h2>Akut</h2><span class="hint">Första hjälpen, steg för steg</span></div>
-  <div class="tabs">%EMERGENCY%</div>
+  <section>
+    <h2>Akut</h2>
+    <ul class="list cols">%EMERGENCY%</ul>
+    <details class="inline"><summary>+ Fler akuta ämnen (%MORECOUNT%)</summary><ul class="list cols">%MORE%</ul></details>
+  </section>
 
-  <div class="sec"><span class="num">02</span><h2>Verktyg</h2></div>
-  <div class="tiles tools">
-    <a class="tile go" href="ai/"><span class="k">AI · offline</span><b>Fråga AI</b><span class="d">Skriv eller prata på svenska. Svarar ur böckerna och visar källan.</span></a>
-    <a class="tile" href="map/"><span class="k">Karta · hela Sverige</span><b>Karta</b><span class="d">Sök ort, gata och adress. Närmaste sjukhus, apotek och vatten.</span></a>
-    <a class="tile olive" href="map/?gps=1"><span class="k">GPS</span><b>Var är jag?</b><span class="d">Din position på kartan, med USB GPS-mottagare eller mobilen.</span></a>
-    <a class="tile" href="skriv-ut/"><span class="k">Papper</span><b>Skriv ut</b><span class="d">Första hjälpen, varningar, vatten och värme. Gör det nu.</span></a>
-    <a class="tile" href="checklista/"><span class="k">Hemberedskap</span><b>Checklista</b><span class="d">Har du det du behöver för en vecka?</span></a>
-  </div>
+  <section>
+    <h2>Verktyg</h2>
+    <ul class="list rows tools">
+      <li><a href="ai/">Fråga AI</a><small>Fråga på svenska. Svaret bygger på krislådans böcker.</small></li>
+      <li><a href="map/">Karta</a><small>Hela Sverige. Sök ort, gata och adress, närmaste sjukhus och apotek.</small></li>
+      <li><a href="map/?gps=1">Var är jag?</a><small>Din position, med en USB GPS-mottagare eller mobilen.</small></li>
+    </ul>
+  </section>
 
-  <div class="sec"><span class="num">03</span><h2>Sök i biblioteken</h2></div>
-  <form class="search" id="search">
-    <input type="search" id="q" placeholder="t.ex. hypothermia, water purification, kantarell" autocomplete="off" aria-label="Sök i biblioteken">
-    <button type="submit" class="btn go">Sök (engelska)</button>
-    <button type="button" class="btn ghost" id="sv">Sök på svenska</button>
-  </form>
-  <p class="lead" style="margin-top:8px">De flesta böcker är på engelska, så sök med engelska ord. Eller fråga AI:n på svenska.</p>
+  <section>
+    <h2>Sök i biblioteken</h2>
+    <form class="search" id="search">
+      <input type="search" id="q" placeholder="Sök, helst på engelska" autocomplete="off" aria-label="Sök i biblioteken">
+      <button type="submit">Sök</button>
+      <button type="button" class="plain" id="sv">På svenska</button>
+    </form>
+  </section>
 
-  <div class="sec"><span class="num">04</span><h2>Myndigheternas råd</h2><span class="hint">1177 · MCF · Livsmedelsverket, sparade för läsning utan internet</span></div>
-  %ADVICE%
-
-  <div class="sec"><span class="num">05</span><h2>Böcker</h2><span class="hint">De viktigaste, som PDF</span></div>
-  <div class="tiles">%BOOKS%
-    <a class="tile" href="docs/"><span class="k">Alla filer</span><b>Alla dokument</b><span class="d">Broschyrer och hela boksamlingen</span></a>
+  <div class="later">
+    <details class="more"><summary><b>Myndigheternas råd</b><span>%ADVICECOUNT% sidor från 1177, MCF och Livsmedelsverket</span></summary>
+      <div class="inner">%ADVICE%</div></details>
+    <details class="more"><summary><b>Böcker</b><span>De viktigaste som PDF</span></summary>
+      <div class="inner"><ul class="list rows">%BOOKS%<li><a href="docs/">Alla dokument</a><small>Hela samlingen</small></li></ul></div></details>
+    <details class="more"><summary><b>Alla bibliotek</b><span>%COUNT% st</span></summary>
+      <div class="inner">%GROUPS%</div></details>
+    <details class="more"><summary><b>Förbered dig</b><span>Skriv ut, checklista, mobilens GPS</span></summary>
+      <div class="inner"><ul class="list rows">
+        <li><a href="skriv-ut/">Skriv ut</a><small>Första hjälpen, varningar, vatten och värme på papper. Gör det medan det finns ström.</small></li>
+        <li><a href="checklista/">Checklista</a><small>Har du det du behöver för en vecka hemma?</small></li>
+        <li><a href="mobil/">Mobilens GPS</a><small>Ställ in en mobil så att den kan visa din position.</small></li>
+      </ul></div></details>
   </div>
 
-  <div class="sec"><span class="num">06</span><h2>Alla bibliotek</h2></div>
-  %GROUPS%
-
-  <footer class="kit">KRISLÅDA · Swedish-doomsdaykit · Starta: Starta Krislåda.command · Kontrollera en gång i månaden: Kontrollera Krislåda.command<br>
-  Bibliotek från Kiwix · Karta © OpenStreetMap · Råd från 1177, MCF och Livsmedelsverket</footer>
+  <footer class="kit">Kontrollera en gång i månaden med Kontrollera Krislåda.command · Bibliotek från Kiwix · Karta © OpenStreetMap · Råd från 1177, MCF och Livsmedelsverket</footer>
 </main>
 <script>
   const KIWIX = 'http://' + (location.hostname || 'localhost') + ':8090';   // the libraries are always plain http
@@ -325,12 +343,11 @@ TEMPLATE = r"""<!doctype html>
   document.getElementById('sv').addEventListener('click', () => go(SWE.length ? SWE : ENG));
   const clock = () => { document.getElementById('clock').textContent = new Date().toLocaleString('sv-SE', { dateStyle: 'medium', timeStyle: 'short' }); };
   clock(); setInterval(clock, 30000);
-  // On battery: say so, with what saves power.
   const battery = () => fetch('/ai-api/status').then(r => r.json()).then(s => {
     const b = s.battery, el = document.getElementById('battery');
     if (b && b.on_battery) {
       el.hidden = false;
-      el.innerHTML = `Macen går på batteri: ${b.percent} %. Spara ström: sänk ljusstyrkan, stäng andra appar, välj <b>Spara batteri</b> i AI:n och ställ få frågor.`;
+      el.textContent = `Datorn går på batteri (${b.percent} %). Spara ström: sänk ljusstyrkan, stäng andra appar och välj Spara batteri i AI:n.`;
     } else el.hidden = true;
   }).catch(() => {});
   battery(); setInterval(battery, 60000);
