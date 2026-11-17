@@ -18,6 +18,28 @@ WEB = os.path.join(HOME, "web")
 DOCS = os.path.join(HOME, "documents")
 
 # (Swedish, English, article). Articles are looked up in WikiMed, then MDWiki.
+# Where a Swedish authority page on the same thing is saved (scripts/fetch-swedish-pages.py),
+# the button opens that page in Swedish, with the English article one tap away.
+SWEDISH = {
+    'Cardiopulmonary_resuscitation': '1177 - Hjärt-lungräddning',
+    'Bleeding': '1177 - Stoppa en blödning',
+    'Tourniquet': 'MCF - Stoppa en blödning',
+    'Choking': '1177 - Om någon sätter i halsen',
+    'Shock_(circulatory)': '1177 - Chock',
+    'Burn': '1177 - Brännskador',
+    'Frostbite': '1177 - Köldskador – förfrysning',
+    'Heat_stroke': '1177 - Värmeslag',
+    'Anaphylaxis': '1177 - Allergisk chock – anafylaxi',
+    'Head_injury': '1177 - Hjärnskakning',
+    'Wound': '1177 - Behandling av stora sår',
+    'Carbon_monoxide_poisoning': '1177 - Inandning av skadlig gas',
+    'Poisoning': '1177 - Förgiftning',
+    'Drowning': '1177 - Drunkningsolyckor',
+    'Snakebite': '1177 - Huggormsbett',
+    'Tick-borne_encephalitis': '1177 - Fästingbett',
+    'Potassium_iodide': 'MCF - Varning kring Sveriges kärnkraftverk',
+}
+SV_DIR = "library/Svenska myndigheter"
 EMERGENCY = [
     ("Hjärt-lungräddning", "CPR", "Cardiopulmonary_resuscitation"),
     ("Kraftig blödning", "Severe bleeding", "Bleeding"),
@@ -101,6 +123,19 @@ GROUPS = [
 ]
 
 
+ADVICE_ORDER = ["1177", "MCF", "Livsmedelsverket", "Krisinformation"]
+ADVICE_NAMES = {"1177": "1177 · Första hjälpen och skador", "MCF": "MCF · Hemberedskap, varningar, skyddsrum, brand",
+                "Livsmedelsverket": "Livsmedelsverket · Vatten och mat", "Krisinformation": "Krisinformation.se"}
+
+
+def swedish_page(stem):
+    """(link to the reader page, authority) for a saved Swedish page, or (None, None)."""
+    if not stem or not os.path.exists(os.path.join(DOCS, SV_DIR, stem + ".md")):
+        return (None, None)
+    rel = "docs/" + SV_DIR + "/" + stem + ".md"
+    return ("las/?f=" + urllib.request.quote(rel), stem.split(" - ", 1)[0])
+
+
 def kiwix_ok(path):
     try:
         req = urllib.request.Request(KIWIX + path, method="HEAD")
@@ -137,8 +172,20 @@ def main():
         for b in med_books:
             path = f"/content/{b['name']}/{art}"
             if kiwix_ok(path):
-                emergency.append((sv, en, f"/viewer#{b['name']}/{art}"))
+                emergency.append((sv, en, f"/viewer#{b['name']}/{art}", swedish_page(SWEDISH.get(art))))
                 break
+
+    # Swedish authorities' advice, grouped by authority.
+    advice = {}
+    folder = os.path.join(DOCS, SV_DIR)
+    for name in sorted(os.listdir(folder)) if os.path.isdir(folder) else []:
+        if name.endswith(".md") and " - " in name:
+            src, title = name[:-3].split(" - ", 1)
+            advice.setdefault(src, []).append((title, swedish_page(name[:-3])))
+    advice_html = "".join(
+        f'<h3>{html.escape(ADVICE_NAMES.get(src, src))}</h3><div class="chips">'
+        + "".join(f'<a class="chip" href="{href}"><b>{html.escape(t)}</b></a>' for t, href in items) + "</div>"
+        for src, items in sorted(advice.items(), key=lambda kv: ADVICE_ORDER.index(kv[0]) if kv[0] in ADVICE_ORDER else 99))
 
     books_html = []
     for label, desc, rel in BOOKS:
@@ -164,12 +211,16 @@ def main():
         groups_html.append(f'<h3>Övrigt · Other</h3><div class="grid">{cards}</div>')
 
     emergency_html = "".join(
+        (f'<div class="chip"><a class="main" href="{sv_href}"><b>{html.escape(sv)}</b><span>{html.escape(sv_src)} · på svenska</span></a>'
+         f'<a class="en" data-k="{html.escape(k)}">{html.escape(en)} (engelska)</a></div>')
+        if sv_href else
         f'<a class="chip" data-k="{html.escape(k)}"><b>{html.escape(sv)}</b><span>{html.escape(en)}</span></a>'
-        for sv, en, k in emergency)
+        for sv, en, k, (sv_href, sv_src) in emergency)
 
     page = TEMPLATE
     for key, val in {
         "%EMERGENCY%": emergency_html or "<p>Starta delningen så att biblioteket är igång.</p>",
+        "%ADVICE%": advice_html or "<p>Kör installationen för att hämta myndigheternas råd.</p>",
         "%BOOKS%": "".join(books_html),
         "%GROUPS%": "".join(groups_html) or "<p>Inga bibliotek hittades. Kör share-library.sh.</p>",
         "%ENG%": json.dumps(eng),
@@ -214,6 +265,10 @@ TEMPLATE = r"""<!doctype html>
   .chip, .card { display: block; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; color: var(--fg); text-decoration: none; cursor: pointer; }
   .chip:hover, .card:hover { border-color: var(--accent); }
   .chip b, .card b { display: block; }
+  div.chip { padding: 0; display: flex; flex-direction: column; }
+  div.chip a.main { color: var(--fg); text-decoration: none; padding: 10px 12px 4px; flex: 1; }
+  div.chip a.en { font-size: 13px; color: var(--muted); padding: 0 12px 8px; text-decoration: underline; }
+  div.chip a.main span { color: var(--muted); font-size: 14px; display: block; }
   .chip span, .card span { display: block; color: var(--muted); font-size: 14px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
   .big { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
@@ -254,6 +309,10 @@ TEMPLATE = r"""<!doctype html>
 
   <h2>Akut · Emergency</h2>
   <div class="chips">%EMERGENCY%</div>
+
+  <h2>Svenska myndigheters råd · Swedish authorities' advice</h2>
+  <p class="sub">Sparade från 1177, MCF, Livsmedelsverket och Krisinformation, så att de går att läsa utan internet.</p>
+  %ADVICE%
 
   <h2>Viktigaste böckerna · Key books</h2>
   <div class="grid">%BOOKS%</div>

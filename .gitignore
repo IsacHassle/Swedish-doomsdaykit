@@ -8,12 +8,14 @@
 !/install.sh
 !/Starta Krislåda.command
 !/Installera Krislåda.command
+!/Kontrollera Krislåda.command
 !/Krislåda - guide att skriva ut.pdf
 !/hamta.sh
 !/config/
 !/scripts/
 !/web/
 !/docs/
+!/.github/
 
 # Built or downloaded inside web/
 /web/index.html

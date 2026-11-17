@@ -25,6 +25,16 @@ Packaged by [Kiwix](https://kiwix.org) and [openZIM](https://openzim.org), downl
 
 The books extracted by `scripts/extract-documents.py` come from these libraries and keep their licences.
 
+## Swedish authorities' advice pages
+
+Saved by `scripts/fetch-swedish-pages.py` from each authority's own website, on the user's own computer, for reading
+without internet. The list is in `config/swedish-pages.txt`. Not redistributed from this repository.
+
+- [1177](https://www.1177.se) (Inera AB, on behalf of Sweden's regions): first aid and injuries
+- [Myndigheten för civilt försvar (MCF)](https://www.mcf.se): home preparedness, warnings, shelters, fire safety
+- [Livsmedelsverket](https://www.livsmedelsverket.se): drinking water and food in a crisis
+- [Krisinformation.se](https://www.krisinformation.se)
+
 ## Swedish government brochure
 
 *Om krisen eller kriget kommer* and *In case of crisis or war*, © Myndigheten för civilt försvar (MCF, formerly MSB).

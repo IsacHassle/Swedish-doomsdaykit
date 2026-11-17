@@ -56,7 +56,8 @@ Resten av sidan är bruksanvisningen. Samma text finns i utskriftsguiden, och AI
     - **en sökruta** över alla bibliotek (engelska ord fungerar bäst, det finns en svensk knapp också)
     - **🤖 Fråga AI**: fråga AI:n på svenska, se guiden nedan
     - **🗺 Karta**: kartan över Sverige, med adressökning
-    - **29 akutknappar**: hjärt-lungräddning, blödning, brännskador, nedkylning, kolmonoxid, förgiftning, förlossning med mera
+    - **29 akutknappar**: hjärt-lungräddning, blödning, brännskador, nedkylning, kolmonoxid, förgiftning, förlossning med mera. De flesta öppnar 1177:s eller MCF:s råd på svenska, med den engelska artikeln ett tryck bort
+    - **Svenska myndigheters råd**: 63 sidor från 1177, MCF, Livsmedelsverket och Krisinformation, sparade för läsning utan internet
     - **de 10 viktigaste böckerna** som PDF, och **alla dokument**
 3. **Familjens mobiler:** anslut till samma wifi och öppna adressen som Terminal-fönstret visar (till exempel `http://192.168.1.23:8091`). Inget internet behövs. AI:n och kartan fungerar från mobilen också, Macen gör jobbet. En router på batteri fungerar, och Macens egen delade anslutning också.
 
@@ -81,7 +82,7 @@ AI:n körs helt på Macen. Öppna den från startsidan: **🤖 Fråga AI** (elle
 
     | Läge | Använd när | Tid |
     |---|---|---|
-    | 📚 **Svar ur böckerna** | Det mesta: skador, sjukdom, läkemedel, vatten, mat, värme, myndigheternas råd. Den läser krislådans böcker (sjukvårdsböcker, NHS läkemedelsfakta, vattenrening, mat, MCF-broschyren, Ready.gov-guiderna) och visar vilka böcker svaret bygger på. Tryck på en för att öppna den | Cirka 10 till 40 s |
+    | 📚 **Svar ur böckerna** | Det mesta: skador, sjukdom, läkemedel, vatten, mat, värme, myndigheternas råd. Den läser krislådans böcker (1177, MCF och Livsmedelsverket på svenska, sjukvårdsböcker, NHS läkemedelsfakta, vattenrening, mat, MCF-broschyren, Ready.gov-guiderna) och visar vilka böcker svaret bygger på. Tryck på en för att öppna den | Cirka 10 till 40 s |
     | ⚡ **Snabbt svar** | När det är bråttom, eller för att fråga om ett **foto**. Samma stora AI, utan böckerna | Cirka 5 till 20 s |
     | 🔋 **Spara batteri** | När Macen går på batteri och du inte vet när du kan ladda. Mindre AI, enklare svar, tar också foton | Snabbare, lättare |
 
@@ -136,10 +137,13 @@ Man klarar sig veckor utan mat men bara dagar utan vatten.
 | Ready.gov (USA:s FEMA) | Steg-för-steg-guider som den svenska broschyren inte går in på: strålning, kärnvapenexplosion, kemolyckor, explosioner, långa strömavbrott, vinterväder, pandemier. AI:n läser guiderna och FEMA:s handbok "Are You Ready?" |
 | A Library of Knots | Knopar för skydd, surrning och bärande |
 
-### 3. Information
+### 3. Svenska myndigheters råd och information
 
 | Innehåll | Varför det finns med |
 |---|---|
+| 1177: första hjälpen och skador | Hjärt-lungräddning på vuxna och barn, stabilt sidoläge, luftvägsstopp, blödning, chock, allergisk chock, förgiftning, brännskador, köldskador, sår, hjärnskakning, huggorms- och fästingbett med mera, på svenska. Akutknapparna öppnar dem direkt |
+| MCF: hemberedskap, varningar, skyddsrum | Vatten, värme, mat, medicin, kommunikation och kontanter för en vecka; VMA och Hesa Fredrik, varning kring kärnkraftverk, skyddsrum, utrymning, höjd beredskap, brand, översvämning, värmebölja |
+| Livsmedelsverket | Dricksvatten i dunk, laga mat utan el, matförråd |
 | MCF:s broschyr, på svenska och engelska | Myndigheternas råd: hemberedskap, varningssignaler, vad samhället förväntar sig av dig |
 | Svenska Wikipedia | Inledningen av varje artikel: svenska platser, växter, djur, svampar och nästan allt annat |
 
@@ -166,9 +170,10 @@ Lägg filer i krislådans mapp `documents/` (kontaktlistor, läkemedelslistor, f
 |---|---|
 | `Installera Krislåda.command` | Installerar eller lagar allt |
 | `Starta Krislåda.command` | Dubbelklicka för att starta allt |
-| `config/` | `libraries.txt` (vilka bibliotek), `AI-PROMPT.txt` (AI:ns instruktioner), `document-names.json` (boktitlar) |
-| `scripts/` | `share-library.sh` (start), `serve-web.py` (webbservern, och kopplingen mellan AI-sidan och Ollama/AnythingLLM), `build-home.py` (startsidan), nedladdningsstegen `get-*.sh`, `setup-ai.sh`, `embed-documents.sh`, `extract-documents.py`, `build-map-index.py` (kartans sökning) |
-| `web/` | Startsidan, AI-sidan (`web/ai/`) och kartan (`web/map/`) |
+| `Kontrollera Krislåda.command` | Dubbelklicka för att kontrollera att allt fungerar |
+| `config/` | `libraries.txt` (vilka bibliotek), `swedish-pages.txt` (vilka myndighetssidor), `AI-PROMPT.txt` (AI:ns instruktioner), `document-names.json` (boktitlar) |
+| `scripts/` | `share-library.sh` (start), `serve-web.py` (webbservern, och kopplingen mellan AI-sidan och Ollama/AnythingLLM), `build-home.py` (startsidan), nedladdningsstegen `get-*.sh`, `setup-ai.sh`, `embed-documents.sh`, `extract-documents.py`, `fetch-swedish-pages.py` (myndigheternas råd), `update-libraries.sh`, `kontroll.sh`, `build-map-index.py` (kartans sökning) |
+| `web/` | Startsidan, AI-sidan (`web/ai/`), kartan (`web/map/`) och läsaren för textdokument (`web/las/`) |
 | `library/` | Biblioteken (.zim-filer), nedladdade. Appen Kiwix kan också öppna dem |
 | `documents/` | MCF-broschyren, och `library/` med varje bok som PDF, namngiven efter titel |
 | `maps/` | Kartfilerna för Sverige och världen |
@@ -176,11 +181,13 @@ Lägg filer i krislådans mapp `documents/` (kontaktlistor, läkemedelslistor, f
 
 ## Håll den uppdaterad
 
-Biblioteken uppdaterar sig inte själva. Några gånger om året kan du lägga in nyare filnamn från https://download.kiwix.org/zim/ i `config/libraries.txt` och köra `bash scripts/download-library.sh`. Det är alltid säkert att köra igen: färdiga filer hoppas över och avbrutna fortsätter. Startsidan bygger om sig själv varje gång du startar krislådan. `git pull` (eller en ny nedladdning) ger dig den senaste versionen av själva krislådan.
+Några gånger om året, med internet: kör `bash scripts/update-libraries.sh`. Den hämtar de senaste versionerna av biblioteken och myndigheternas sidor, tar bort de gamla versionerna och läser in nya böcker i AI:n. Det är alltid säkert att köra igen: färdiga filer hoppas över och avbrutna fortsätter. Startsidan bygger om sig själv varje gång du startar krislådan. `git pull` (eller en ny nedladdning) ger dig den senaste versionen av själva krislådan.
+
+Om Kiwix har tagit bort en version som står i listan hämtar installationen automatiskt den senaste versionen av samma bibliotek, så krislådan går att installera även om några år.
 
 Kartans sökning kan byggas om från färsk OpenStreetMap-data med `scripts/build-map-index.py` (kräver `brew install osmium-tool` och `maps/osm/sweden-latest.osm.pbf` från download.geofabrik.de).
 
-En gång i månaden: stäng av wifi och kontrollera att startsidan, en sökning, kartan och AI:n fortfarande fungerar.
+**En gång i månaden:** stäng av wifi och dubbelklicka på **Kontrollera Krislåda.command**. Den går igenom bibliotek, kartor, dokument och AI (den ställer en testfråga) och visar ✅ eller ⚠️ för varje del, med vad du ska göra om något saknas.
 
 ## Gör också detta
 

@@ -368,7 +368,11 @@
         let el;
         try {
           const r = await fetch('/ai-api/doc?name=' + encodeURIComponent(name));
-          if (r.ok) { el = document.createElement('a'); el.href = '../' + (await r.json()).href; el.target = '_blank'; }
+          if (r.ok) {
+            const href = (await r.json()).href;
+            el = document.createElement('a'); el.target = '_blank';
+            el.href = /\.(md|txt)$/i.test(href) ? '../las/?f=' + encodeURIComponent(decodeURIComponent(href)) : '../' + href;   // text opens in the reader
+          }
         } catch {}
         el = el || document.createElement('span');
         el.textContent = '📄 ' + name.replace(/\.(pdf|md)$/i, '');
