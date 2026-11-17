@@ -188,6 +188,11 @@
     s.push(status.books ? '<span class="ok">● Böckerna (AnythingLLM) är igång</span>' : '<span class="bad">● Böckerna är inte igång</span>');
     if (!status.ollama) fix.push('Öppna appen Ollama och vänta tio sekunder.');
     if (!status.books) fix.push('För svar ur böckerna: öppna appen AnythingLLM.');
+    const b = status.battery;
+    if (b && b.on_battery) {
+      s.push(`<span class="bad">🔋 Macen går på batteri: ${b.percent}%</span>`);
+      if (b.percent < 40 && mode !== 'crisis-small') fix.push('Lite batteri: välj 🔋 Spara batteri, så räcker strömmen längre.');
+    }
     $('#status').innerHTML = s.join('');
     $('#fix').textContent = fix.join(' ');
     if (status.lan) $('#lanurl').textContent = `http://${status.lan}:${status.port}/ai/`;

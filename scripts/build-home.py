@@ -295,6 +295,8 @@ TEMPLATE = r"""<!doctype html>
     </div>
   </div>
 
+  <div class="alert" id="battery" style="display:none; margin-top:10px"></div>
+
   <form class="search" id="search">
     <input id="q" placeholder="Sök i alla bibliotek, t.ex. hypothermia, water purification" autocomplete="off" aria-label="Sök">
     <button type="submit">Sök (engelska)</button>
@@ -340,6 +342,15 @@ TEMPLATE = r"""<!doctype html>
   };
   document.getElementById('search').addEventListener('submit', e => { e.preventDefault(); go(ENG); });
   document.getElementById('sv').addEventListener('click', () => go(SWE.length ? SWE : ENG));
+  // On battery: say so, with what saves power.
+  const battery = () => fetch('/ai-api/status').then(r => r.json()).then(s => {
+    const b = s.battery, el = document.getElementById('battery');
+    if (b && b.on_battery) {
+      el.style.display = 'block';
+      el.innerHTML = `<b>🔋 Macen går på batteri: ${b.percent}%.</b> Spara ström: sänk skärmens ljusstyrka, stäng andra appar, välj <b>🔋 Spara batteri</b> i AI:n och ställ få frågor.`;
+    } else el.style.display = 'none';
+  }).catch(() => {});
+  battery(); setInterval(battery, 60000);
 </script>
 </body>
 </html>

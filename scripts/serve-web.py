@@ -58,6 +58,18 @@ def lan_address():
     return ""
 
 
+def battery():
+    """{"percent": 45, "on_battery": True}, or None on a Mac without a battery."""
+    try:
+        out = subprocess.run(["pmset", "-g", "batt"], capture_output=True, text=True, timeout=3).stdout
+    except (OSError, subprocess.SubprocessError):
+        return None
+    m = re.search(r"(\d+)%", out)
+    if not m:
+        return None
+    return {"percent": int(m.group(1)), "on_battery": "Battery Power" in out}
+
+
 def doc_index():
     """File name -> path under docs/, so the AI page can link a source to its PDF."""
     found = {}
@@ -117,7 +129,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             conn.close()
 
     def ai_status(self):
-        status = {"ollama": False, "models": [], "books": False, "lan": lan_address(), "port": PORT}
+        status = {"ollama": False, "models": [], "books": False, "lan": lan_address(), "port": PORT, "battery": battery()}
         try:
             tags = get_json(OLLAMA, "/api/tags") or {}
             status["ollama"] = True
