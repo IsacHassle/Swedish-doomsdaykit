@@ -330,6 +330,7 @@ TEMPLATE = r"""<!doctype html>
   <div class="big">
     <a class="card" href="map/"><b>Karta över Sverige</b><span>Zooma in till enskilda hus. Sök adress, tryck för koordinater</span></a>
     <a class="card" href="docs/"><b>Alla dokument</b><span>Broschyrer och hela boksamlingen som PDF</span></a>
+    <a class="card" href="mobil/"><b>📍 GPS på mobilen</b><span>Se var du är på kartan med mobilens GPS, utan internet. Ställ in en gång per mobil</span></a>
   </div>
 
   <h2>Alla bibliotek · All libraries</h2>
@@ -338,7 +339,7 @@ TEMPLATE = r"""<!doctype html>
   <footer>Krislåda · Swedish-doomsdaykit · Starta: Starta Krislåda.command · Bibliotek från Kiwix, karta © OpenStreetMap</footer>
 </main>
 <script>
-  const KIWIX = location.protocol + '//' + (location.hostname || 'localhost') + ':8090';
+  const KIWIX = 'http://' + (location.hostname || 'localhost') + ':8090';   // the libraries are always plain http
   const ENG = %ENG%, SWE = %SWE%;
   document.querySelectorAll('[data-k]').forEach(a => a.href = KIWIX + a.dataset.k);
   const go = books => {

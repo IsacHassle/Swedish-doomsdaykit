@@ -16,14 +16,18 @@ import http.server
 import json
 import os
 import re
+import ssl
 import subprocess
 import sys
+import threading
 import urllib.parse
 
 KIT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # the kit folder
 ROOT = os.path.join(KIT, "web")
 DOCS = os.path.join(KIT, "documents")
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8091
+HTTPS_PORT = PORT + 352   # 8443: the same site over https, so phones allow the map to use their GPS
+CERTS = os.path.join(KIT, "tools", "certs")
 
 OLLAMA = ("127.0.0.1", 11434)
 ANYTHINGLLM = ("127.0.0.1", 3001)
@@ -65,6 +69,10 @@ def local_name():
         return n + ".local" if n else ""
     except (OSError, subprocess.SubprocessError):
         return ""
+
+
+def https_ready():
+    return os.path.exists(os.path.join(CERTS, "server.crt")) and os.path.exists(os.path.join(CERTS, "server.key"))
 
 
 def battery():
@@ -139,7 +147,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def ai_status(self):
         status = {"ollama": False, "models": [], "books": False, "lan": lan_address(), "port": PORT, "battery": battery(),
-                  "name": local_name()}
+                  "name": local_name(), "https_port": HTTPS_PORT if https_ready() else None}
         try:
             tags = get_json(OLLAMA, "/api/tags") or {}
             status["ollama"] = True
@@ -208,6 +216,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         url = urllib.parse.urlsplit(self.path)
+        if url.path == "/krislada-ca.crt":   # the kit's certificate authority, for phones to trust once
+            data = open(os.path.join(CERTS, "ca.crt"), "rb").read() if os.path.exists(os.path.join(CERTS, "ca.crt")) else b""
+            if not data:
+                return self.send_json({"error": "no certificate"}, 404)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/x-x509-ca-cert")
+            self.send_header("Content-Disposition", 'attachment; filename="Krislada.crt"')
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+            return
         if url.path == "/ai-api/status":
             return self.ai_status()
         if url.path == "/ai-api/doc":
@@ -265,9 +284,20 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         pass  # keep the terminal quiet
 
 
+def serve_https():
+    """The same site on HTTPS_PORT, with the certificate from scripts/make-cert.sh."""
+    ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    ctx.load_cert_chain(os.path.join(CERTS, "server.crt"), os.path.join(CERTS, "server.key"))
+    httpd = http.server.ThreadingHTTPServer(("0.0.0.0", HTTPS_PORT), Handler)
+    httpd.socket = ctx.wrap_socket(httpd.socket, server_side=True)
+    httpd.serve_forever()
+
+
 if __name__ == "__main__":
     http.server.ThreadingHTTPServer.allow_reuse_address = True
     http.server.ThreadingHTTPServer.daemon_threads = True
+    if https_ready():
+        threading.Thread(target=serve_https, daemon=True).start()
     with http.server.ThreadingHTTPServer(("0.0.0.0", PORT), Handler) as httpd:
         print(f"Crisis kit on this Mac: http://localhost:{PORT}/")
         httpd.serve_forever()

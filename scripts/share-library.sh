@@ -29,6 +29,7 @@ sleep 1
 
 "$SERVE" --port="$LIB_PORT" "${zims[@]}" >/dev/null 2>&1 &
 LIB_PID=$!
+bash "$KIT/scripts/make-cert.sh" || true   # https for phones (GPS needs it); quick after the first time
 python3 "$KIT/scripts/serve-web.py" "$WEB_PORT" >/dev/null 2>&1 &
 WEB_PID=$!
 trap 'kill $LIB_PID $WEB_PID 2>/dev/null; echo; echo "  Stoppad."' EXIT
@@ -44,6 +45,7 @@ echo ""
 echo "  På den här Macen:        http://localhost:$WEB_PORT"
 [ -n "$NAME" ] && echo "  På mobiler (samma wifi): http://$NAME.local:$WEB_PORT   (fungerar alltid på iPhone)"
 [ -n "$IP" ] && echo "                     eller: http://$IP:$WEB_PORT   (om den första inte fungerar, till exempel på Android)"
+[ -n "$NAME" ] && echo "  Med GPS på mobilen:      https://$NAME.local:8443   (ställ in en gång: öppna /mobil/ på mobilen)"
 echo ""
 echo "  Fråga AI:                http://localhost:$WEB_PORT/ai/"
 [ -n "$IP" ] && echo "  Fråga AI från mobilen:   http://$IP:$WEB_PORT/ai/"

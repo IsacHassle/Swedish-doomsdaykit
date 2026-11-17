@@ -35,6 +35,9 @@ if [ -f "$KIT/web/map/data/places.json.gz" ] && ls "$KIT/web/map/data/letters/"*
   ok "Kartans sökning (orter, gator, adresser)"
 else bad "Kartans sökning saknas. Kör installationen igen."; fi
 
+if [ -f "$KIT/tools/certs/server.crt" ]; then ok "https för mobilens GPS (certifikat finns)"
+else echo "  ℹ️  https för mobilens GPS skapas när du startar Krislådan första gången."; fi
+
 section "Dokument"
 n=$(find "$KIT/documents" -type f \( -name '*.pdf' -o -name '*.md' \) | wc -l | tr -d ' ')
 [ -s "$KIT/documents/Om-krisen-eller-kriget-kommer.pdf" ] && ok "Broschyren Om krisen eller kriget kommer" || bad "Broschyren saknas. Kör installationen igen med internet."

@@ -314,7 +314,35 @@
     });
     window.kitMap = map;
     map.addControl(new maplibregl.NavigationControl(), 'top-right');
-    map.addControl(new maplibregl.GeolocateControl({ trackUserLocation: true }), 'top-right');
+    // Your position (the phone's GPS). Browsers only allow it on https pages or on the Mac itself;
+    // elsewhere the button explains how to set up the phone (web/mobil/).
+    if (window.isSecureContext) {
+      const geo = new maplibregl.GeolocateControl({ trackUserLocation: true, positionOptions: { enableHighAccuracy: true, timeout: 30000 } });
+      map.addControl(geo, 'top-right');
+      geo.on('geolocate', p => setCoords(p.coords.longitude, p.coords.latitude, `Du är här (±${Math.round(p.coords.accuracy)} m)`));
+      geo.on('error', e => {
+        const mac = /Mac/.test(navigator.platform) && !('ontouchend' in document);
+        note(e.code === 1 ? 'Platsåtkomst nekades. Tillåt plats för den här sidan i webbläsarens inställningar.'
+           : mac ? 'Macen har ingen GPS och hittar inte sin position utan internet. Använd mobilen för din position.'
+           : 'Hittade ingen GPS-signal än. Gå ut eller nära ett fönster och försök igen.');
+        $('#panel').classList.remove('min');
+      });
+    } else {
+      class GpsHelp {
+        onAdd() {
+          const el = document.createElement('div');
+          el.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+          el.innerHTML = '<button type="button" title="Min position (GPS)" aria-label="Min position" style="font-size:18px">⦿</button>';
+          el.querySelector('button').onclick = () => {
+            $('#panel').classList.remove('min');
+            $('#note').innerHTML = 'För din position (GPS) behöver mobilen öppna kartan säkert, med https. <a href="/mobil/">Ställ in det en gång</a>, eller skriv in dina koordinater i sökrutan.';
+          };
+          return el;
+        }
+        onRemove() {}
+      }
+      map.addControl(new GpsHelp(), 'top-right');
+    }
     map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
     pin = new maplibregl.Marker({ color: '#d32f2f' });
 

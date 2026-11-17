@@ -155,7 +155,8 @@ En offline-karta över hela Sverige (med delar av Norge, Finland och Danmark i s
 
 - **Sök** efter vilken ort, by, gata eller adress som helst i Sverige, till exempel *Hornsgatan 50* eller *Storgatan 30, Umeå*. Saknas ett husnummer i OpenStreetMap sätts nålen mellan grannhusen, och kartan säger att läget är ungefärligt.
 - **Närmaste**-knapparna listar de närmaste 🏥 sjukhusen, 🩺 vårdcentralerna, 💊 apoteken, 👮 polisstationerna, 🚒 brandstationerna, 🚰 dricksvattenställena, 🛒 matbutikerna och ⛽ bensinstationerna från kartans mitt.
-- Knapparna **Stockholm** och **Sverige** hoppar dit, och ⦿ visar var du är (på en mobil med GPS).
+- Knapparna **Stockholm** och **Sverige** hoppar dit.
+- **⦿ visar var du är**, med mobilens GPS, helt utan internet. Då räknar också närmaste-knapparna från där du står. Mobilen måste öppna kartan säkert (https), så varje mobil ställs in en gång: öppna **📍 GPS på mobilen** på startsidan (adressen `/mobil/`) och följ stegen för iPhone eller Android. Krislådan gör ett eget certifikat för det, som bara gäller adresser i ditt hemnätverk (`.local` och 192.168…) och inte kan användas för webbplatser på internet. Macen själv har ingen GPS.
 - **Tryck** på kartan för att läsa av exakta koordinater, som du kan skicka vidare via radio eller skriva ner.
 
 ### 5. Fler bibliotek, om du har plats
@@ -174,8 +175,8 @@ Lägg filer i krislådans mapp `documents/` (kontaktlistor, läkemedelslistor, f
 | `Starta Krislåda.command` | Dubbelklicka för att starta allt |
 | `Kontrollera Krislåda.command` | Dubbelklicka för att kontrollera att allt fungerar |
 | `config/` | `libraries.txt` (vilka bibliotek), `swedish-pages.txt` (vilka myndighetssidor), `AI-PROMPT.txt` (AI:ns instruktioner), `document-names.json` (boktitlar) |
-| `scripts/` | `share-library.sh` (start), `serve-web.py` (webbservern, och kopplingen mellan AI-sidan och Ollama/AnythingLLM), `build-home.py` (startsidan), nedladdningsstegen `get-*.sh`, `setup-ai.sh`, `embed-documents.sh`, `extract-documents.py`, `fetch-swedish-pages.py` (myndigheternas råd), `update-libraries.sh`, `kontroll.sh`, `build-map-index.py` (kartans sökning) |
-| `web/` | Startsidan, AI-sidan (`web/ai/`), kartan (`web/map/`), läsaren för textdokument (`web/las/`), utskriftspaketet (`web/skriv-ut/`) och checklistan (`web/checklista/`) |
+| `scripts/` | `share-library.sh` (start), `serve-web.py` (webbservern, och kopplingen mellan AI-sidan och Ollama/AnythingLLM), `build-home.py` (startsidan), nedladdningsstegen `get-*.sh`, `setup-ai.sh`, `embed-documents.sh`, `extract-documents.py`, `fetch-swedish-pages.py` (myndigheternas råd), `update-libraries.sh`, `kontroll.sh`, `make-cert.sh` (https för mobilens GPS), `build-map-index.py` (kartans sökning) |
+| `web/` | Startsidan, AI-sidan (`web/ai/`), kartan (`web/map/`), läsaren för textdokument (`web/las/`), utskriftspaketet (`web/skriv-ut/`), checklistan (`web/checklista/`) och GPS-inställningen för mobiler (`web/mobil/`) |
 | `library/` | Biblioteken (.zim-filer), nedladdade. Appen Kiwix kan också öppna dem |
 | `documents/` | MCF-broschyren, och `library/` med varje bok som PDF, namngiven efter titel |
 | `maps/` | Kartfilerna för Sverige och världen |
