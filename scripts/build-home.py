@@ -191,9 +191,9 @@ TEMPLATE = r"""<!doctype html>
 <title>Krislåda</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%E2%9B%91%3C/text%3E%3C/svg%3E">
 <style>
-  :root { --bg:#f6f5f2; --fg:#1d1d1f; --muted:#5f5f66; --card:#ffffff; --line:#e3e1dc; --accent:#0b5cad; --red:#b3261e; --redbg:#fdecea; }
+  :root { --bg:#f6f5f2; --fg:#1d1d1f; --muted:#5f5f66; --card:#ffffff; --line:#e3e1dc; --accent:#0b5cad; --fill:#0b5cad; --red:#b3261e; --redbg:#fdecea; }
   @media (prefers-color-scheme: dark) {
-    :root { --bg:#141416; --fg:#f2f2f4; --muted:#a3a3ab; --card:#1f1f23; --line:#2e2e34; --accent:#6aa9ff; --red:#ff8a80; --redbg:#3a1d1b; }
+    :root { --bg:#141416; --fg:#f2f2f4; --muted:#a3a3ab; --card:#1f1f23; --line:#2e2e34; --accent:#6aa9ff; --fill:#1f5fae; --red:#ff8a80; --redbg:#3a1d1b; }
   }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.45 -apple-system, system-ui, "Segoe UI", sans-serif; }
@@ -208,7 +208,7 @@ TEMPLATE = r"""<!doctype html>
   .nums span { white-space: nowrap; }
   form.search { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
   form.search input { flex: 1 1 260px; font-size: 18px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--fg); }
-  form.search button { font-size: 16px; padding: 12px 16px; border-radius: 10px; border: 0; background: var(--accent); color: #fff; cursor: pointer; }
+  form.search button { font-size: 16px; padding: 12px 16px; border-radius: 10px; border: 0; background: var(--fill); color: #fff; cursor: pointer; }
   form.search button.alt { background: var(--card); color: var(--fg); border: 1px solid var(--line); }
   .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 8px; }
   .chip, .card { display: block; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; color: var(--fg); text-decoration: none; cursor: pointer; }
@@ -217,7 +217,7 @@ TEMPLATE = r"""<!doctype html>
   .chip span, .card span { display: block; color: var(--muted); font-size: 14px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
   .big { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
-  .big a { background: var(--accent); color: #fff; border: 0; }
+  .big a { background: var(--fill); color: #fff; border: 0; }
   .big a span { color: #e8f0ff; }
   .big.top { margin-top: 14px; }
   .big.top a b { font-size: 18px; }

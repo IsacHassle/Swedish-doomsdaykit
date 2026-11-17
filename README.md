@@ -12,6 +12,10 @@ An offline crisis kit for Sweden, on a Mac. When the internet, the phone network
 
 Everything runs on your own computer. Nothing is sent anywhere.
 
+| Start page | Ask the AI, in Swedish | Map of all of Sweden |
+|---|---|---|
+| ![Start page with emergency topics](docs/screenshots/start-page.png) | ![The AI answering how to keep a flat warm in a power cut](docs/screenshots/ai.png) | ![Map with search, zoomed in on Södersjukhuset](docs/screenshots/map.png) |
+
 ## Install
 
 You need a Mac with Apple Silicon (M1 or newer), about **50 GB** free (16 GB RAM or more recommended for the AI), and an internet connection while installing. It takes a few hours, mostly downloading.
