@@ -43,7 +43,7 @@ Krislådan hamnar i mappen **Krislåda** i din hemmapp.
 - Installationen hämtar allt från originalkällorna och kontrollerar varje bibliotek mot dess kontrollsumma. Den installerar **Ollama** och **AnythingLLM** (AI-apparna) om de saknas.
 - Första gången AnythingLLM öppnas kan den visa en välkomstskärm. Klicka dig igenom den och kör installationen igen om den stannade där.
 - Har du en äldre Mac eller lite utrymme: kör `./install.sh --utan-ai` i mappen, så får du allt utom AI:n (cirka 20 GB).
-- När den är klar: **skriv ut `Krislåda - guide att skriva ut.pdf`** och lägg den hos din hemberedskap. Om Macen saknar ström är papperet det du fortfarande kan läsa.
+- När den är klar: **skriv ut `Krislåda - guide att skriva ut.pdf`**, och tryck **🖨 Skriv ut** på startsidan för första hjälpen, varningssignaler, vatten och värme från 1177, MCF och Livsmedelsverket (cirka 26 sidor). Lägg papperen hos din hemberedskap. Om Macen saknar ström är papperet det du fortfarande kan läsa.
 
 ---
 
@@ -56,6 +56,7 @@ Resten av sidan är bruksanvisningen. Samma text finns i utskriftsguiden, och AI
     - **en sökruta** över alla bibliotek (engelska ord fungerar bäst, det finns en svensk knapp också)
     - **🤖 Fråga AI**: fråga AI:n på svenska, se guiden nedan
     - **🗺 Karta**: kartan över Sverige, med adressökning
+    - **🖨 Skriv ut**: det viktigaste från 1177, MCF och Livsmedelsverket på papper, att skriva ut medan det finns ström
     - **29 akutknappar**: hjärt-lungräddning, blödning, brännskador, nedkylning, kolmonoxid, förgiftning, förlossning med mera. De flesta öppnar 1177:s eller MCF:s råd på svenska, med den engelska artikeln ett tryck bort
     - **Svenska myndigheters råd**: 63 sidor från 1177, MCF, Livsmedelsverket och Krisinformation, sparade för läsning utan internet
     - **de 10 viktigaste böckerna** som PDF, och **alla dokument**
@@ -173,7 +174,7 @@ Lägg filer i krislådans mapp `documents/` (kontaktlistor, läkemedelslistor, f
 | `Kontrollera Krislåda.command` | Dubbelklicka för att kontrollera att allt fungerar |
 | `config/` | `libraries.txt` (vilka bibliotek), `swedish-pages.txt` (vilka myndighetssidor), `AI-PROMPT.txt` (AI:ns instruktioner), `document-names.json` (boktitlar) |
 | `scripts/` | `share-library.sh` (start), `serve-web.py` (webbservern, och kopplingen mellan AI-sidan och Ollama/AnythingLLM), `build-home.py` (startsidan), nedladdningsstegen `get-*.sh`, `setup-ai.sh`, `embed-documents.sh`, `extract-documents.py`, `fetch-swedish-pages.py` (myndigheternas råd), `update-libraries.sh`, `kontroll.sh`, `build-map-index.py` (kartans sökning) |
-| `web/` | Startsidan, AI-sidan (`web/ai/`), kartan (`web/map/`) och läsaren för textdokument (`web/las/`) |
+| `web/` | Startsidan, AI-sidan (`web/ai/`), kartan (`web/map/`), läsaren för textdokument (`web/las/`) och utskriftspaketet (`web/skriv-ut/`) |
 | `library/` | Biblioteken (.zim-filer), nedladdade. Appen Kiwix kan också öppna dem |
 | `documents/` | MCF-broschyren, och `library/` med varje bok som PDF, namngiven efter titel |
 | `maps/` | Kartfilerna för Sverige och världen |
