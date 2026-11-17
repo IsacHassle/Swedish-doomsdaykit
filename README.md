@@ -57,6 +57,7 @@ Resten av sidan är bruksanvisningen. Samma text finns i utskriftsguiden, och AI
     - **🤖 Fråga AI**: fråga AI:n på svenska, se guiden nedan
     - **🗺 Karta**: kartan över Sverige, med adressökning
     - **🖨 Skriv ut**: det viktigaste från 1177, MCF och Livsmedelsverket på papper, att skriva ut medan det finns ström
+    - **✅ Checklista**: MCF:s lista för hemberedskap att bocka av, plus det krislådan själv behöver
     - **29 akutknappar**: hjärt-lungräddning, blödning, brännskador, nedkylning, kolmonoxid, förgiftning, förlossning med mera. De flesta öppnar 1177:s eller MCF:s råd på svenska, med den engelska artikeln ett tryck bort
     - **Svenska myndigheters råd**: 63 sidor från 1177, MCF, Livsmedelsverket och Krisinformation, sparade för läsning utan internet
     - **de 10 viktigaste böckerna** som PDF, och **alla dokument**
@@ -174,7 +175,7 @@ Lägg filer i krislådans mapp `documents/` (kontaktlistor, läkemedelslistor, f
 | `Kontrollera Krislåda.command` | Dubbelklicka för att kontrollera att allt fungerar |
 | `config/` | `libraries.txt` (vilka bibliotek), `swedish-pages.txt` (vilka myndighetssidor), `AI-PROMPT.txt` (AI:ns instruktioner), `document-names.json` (boktitlar) |
 | `scripts/` | `share-library.sh` (start), `serve-web.py` (webbservern, och kopplingen mellan AI-sidan och Ollama/AnythingLLM), `build-home.py` (startsidan), nedladdningsstegen `get-*.sh`, `setup-ai.sh`, `embed-documents.sh`, `extract-documents.py`, `fetch-swedish-pages.py` (myndigheternas råd), `update-libraries.sh`, `kontroll.sh`, `build-map-index.py` (kartans sökning) |
-| `web/` | Startsidan, AI-sidan (`web/ai/`), kartan (`web/map/`), läsaren för textdokument (`web/las/`) och utskriftspaketet (`web/skriv-ut/`) |
+| `web/` | Startsidan, AI-sidan (`web/ai/`), kartan (`web/map/`), läsaren för textdokument (`web/las/`), utskriftspaketet (`web/skriv-ut/`) och checklistan (`web/checklista/`) |
 | `library/` | Biblioteken (.zim-filer), nedladdade. Appen Kiwix kan också öppna dem |
 | `documents/` | MCF-broschyren, och `library/` med varje bok som PDF, namngiven efter titel |
 | `maps/` | Kartfilerna för Sverige och världen |

@@ -313,6 +313,7 @@ TEMPLATE = r"""<!doctype html>
     <a class="card" href="ai/"><b>🤖 Fråga AI · Ask the AI</b><span>Skriv eller prata på svenska. Svarar ur böckerna och visar källan, kan titta på foton. Guide på sidan.</span></a>
     <a class="card" href="map/"><b>🗺 Karta · Map</b><span>Sök gata och adress, hitta närmaste sjukhus, apotek och dricksvatten.</span></a>
     <a class="card" href="skriv-ut/"><b>🖨 Skriv ut · Print</b><span>Första hjälpen, varningar, vatten och värme på papper. Gör det nu, medan det finns ström.</span></a>
+    <a class="card" href="checklista/"><b>✅ Checklista · Checklist</b><span>Har du det du behöver för en vecka? MCF:s lista att bocka av.</span></a>
   </div>
 
   <h2>Akut · Emergency</h2>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checklista · Krislåda</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<meta name="theme-color" content="#0b5cad">
+<style>
+  :root { --bg:#f6f5f2; --fg:#1d1d1f; --muted:#5f5f66; --card:#ffffff; --line:#e3e1dc; --accent:#0b5cad; --fill:#0b5cad; --ok:#1e7a3c; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#141416; --fg:#f2f2f4; --muted:#a3a3ab; --card:#1f1f23; --line:#2e2e34; --accent:#6aa9ff; --fill:#1f5fae; --ok:#6fd08c; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:17px/1.5 -apple-system, system-ui, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 16px; }
+  a { color: var(--accent); }
+  .bar { display:flex; gap:14px; flex-wrap:wrap; font-size:16px; } .bar a { text-decoration:none; }
+  h1 { font-size: 26px; margin: 10px 0 4px; } h2 { font-size: 19px; margin: 22px 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 8px; }
+  .progress { height: 10px; background: var(--line); border-radius: 6px; overflow: hidden; margin: 8px 0 2px; }
+  .progress div { height: 100%; background: var(--ok); width: 0; transition: width .3s; }
+  ul { list-style: none; padding: 0; margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+  li { border-top: 1px solid var(--line); } li:first-child { border-top: 0; }
+  label { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; cursor: pointer; }
+  input[type=checkbox] { width: 22px; height: 22px; margin-top: 2px; flex: none; accent-color: var(--ok); }
+  li.done span { color: var(--muted); text-decoration: line-through; }
+  .src { color: var(--muted); font-size: 14px; margin-top: 6px; }
+  button { font: inherit; font-size: 15px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--fg); cursor: pointer; }
+  @media print { .bar, button { display: none; } body { background: #fff; color: #000; } ul { border: 0; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="bar"><a href="../">← Krislåda</a><a href="#" onclick="print(); return false">🖨 Skriv ut</a></div>
+  <h1>Checklista för hemberedskap</h1>
+  <p class="sub">Bocka av det du har hemma. Målet är att klara dig själv i minst en vecka. Bockarna sparas i den här webbläsaren.</p>
+  <div class="progress"><div id="bar"></div></div>
+  <p class="sub" id="count"></p>
+
+  <h2>Hemma (MCF)</h2>
+  <ul id="mcf"><li><label>Laddar…</label></li></ul>
+  <p class="src" id="mcfsrc"></p>
+
+  <h2>Krislådan</h2>
+  <ul id="kit"></ul>
+
+  <p style="margin-top:18px"><button id="reset">Börja om</button></p>
+</main>
+<script src="../lib/md.js"></script>
+<script>
+(() => {
+  const KEY = 'krislada-checklista';
+  let state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {} };
+  const KIT = [
+    'Krislådan installerad, och kontrollerad med Kontrollera Krislåda.command',
+    'Guiden och första hjälpen-utskriften i en pärm hos hemberedskapen',
+    'Organic Maps med Sverige, och Kiwix med de medicinska biblioteken, på mobilen',
+    'Batteri- eller vevradio, inställd på Sveriges Radio P4',
+    'Laddad powerbank eller batteripaket som räcker till Macen',
+    'Familjen vet hur man öppnar Krislådan från mobilen (samma wifi)',
+  ];
+  function list(el, items) {
+    el.innerHTML = '';
+    for (const text of items) {
+      const li = document.createElement('li');
+      li.innerHTML = '<label><input type="checkbox"><span></span></label>';
+      li.querySelector('span').textContent = text;
+      const box = li.querySelector('input');
+      box.checked = !!state[text]; li.classList.toggle('done', box.checked);
+      box.onchange = () => { state[text] = box.checked; li.classList.toggle('done', box.checked); save(); count(); };
+      el.appendChild(li);
+    }
+  }
+  function count() {
+    const boxes = [...document.querySelectorAll('input[type=checkbox]')];
+    const done = boxes.filter(b => b.checked).length;
+    document.getElementById('count').textContent = `${done} av ${boxes.length} klart`;
+    document.getElementById('bar').style.width = (boxes.length ? 100 * done / boxes.length : 0) + '%';
+  }
+  list(document.getElementById('kit'), KIT);
+  // MCF's own list, from the saved page "Grunder i hemberedskap".
+  const doc = 'docs/library/Svenska myndigheter/MCF - Grunder i hemberedskap.md';
+  fetchDoc(doc).then(t => {
+    const part = (t.split(/\n(?=## )/).find(p => /^## Checklista/.test(p)) || '');
+    const items = part.split('\n').filter(l => /^\s*[-*•]\s+/.test(l)).map(l => l.replace(/^\s*[-*•]\s+/, '').trim());
+    if (!items.length) throw new Error('empty');
+    list(document.getElementById('mcf'), items);
+    const src = (t.match(/^Källa: .*$/m) || [''])[0];
+    document.getElementById('mcfsrc').textContent = src + ' Mer om vatten, mat och värme: se Svenska myndigheters råd på startsidan.';
+    count();
+  }).catch(() => {
+    document.getElementById('mcf').innerHTML = '<li><label>MCF:s checklista saknas. Kör installationen igen med internet.</label></li>';
+    count();
+  });
+  document.getElementById('reset').onclick = () => { state = {}; save(); location.reload(); };
+  count();
+})();
+</script>
+</body>
+</html>
