@@ -26,7 +26,7 @@ tmp=$(mktemp -d)
 for pair in crisis:gemma4:26b crisis-small:gemma4:e4b; do
   name=${pair%%:*}; base=${pair#*:}
   printf 'FROM %s\nSYSTEM """\n%s\n"""\nPARAMETER temperature 0.3\n' "$base" "$(cat "$PROMPT")" > "$tmp/Modelfile"
-  "$OLLAMA" create "$name" -f "$tmp/Modelfile" >/dev/null && echo "Model $name ready"
+  "$OLLAMA" create "$name" -f "$tmp/Modelfile" >/dev/null 2>&1 && echo "Model $name ready"
 done
 rm -rf "$tmp"
 
