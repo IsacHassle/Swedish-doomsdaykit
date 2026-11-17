@@ -240,6 +240,11 @@ TEMPLATE = r"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Krislåda</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<meta name="apple-mobile-web-app-title" content="Krislåda">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0b5cad">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%E2%9B%91%3C/text%3E%3C/svg%3E">
 <style>
   :root { --bg:#f6f5f2; --fg:#1d1d1f; --muted:#5f5f66; --card:#ffffff; --line:#e3e1dc; --accent:#0b5cad; --fill:#0b5cad; --red:#b3261e; --redbg:#fdecea; }
