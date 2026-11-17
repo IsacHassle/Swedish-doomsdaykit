@@ -200,7 +200,7 @@
     }
     $('#status').innerHTML = s.join('');
     $('#fix').textContent = fix.join(' ');
-    if (status.lan) $('#lanurl').textContent = `http://${status.lan}:${status.port}/ai/`;
+    if (status.name || status.lan) $('#lanurl').textContent = [status.name, status.lan].filter(Boolean).map(h => `http://${h}:${status.port}/ai/`).join(' eller ');
     if (!mode || !avail[mode]) {
       const first = ['books', 'crisis', 'crisis-small'].find(m => avail[m]);
       if (first) setMode(first, true);

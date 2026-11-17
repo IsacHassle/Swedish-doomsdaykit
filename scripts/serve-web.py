@@ -58,6 +58,15 @@ def lan_address():
     return ""
 
 
+def local_name():
+    """This Mac's Bonjour name ("Annas-MacBook-Air.local"), which stays the same when the IP changes."""
+    try:
+        n = subprocess.run(["scutil", "--get", "LocalHostName"], capture_output=True, text=True, timeout=2).stdout.strip()
+        return n + ".local" if n else ""
+    except (OSError, subprocess.SubprocessError):
+        return ""
+
+
 def battery():
     """{"percent": 45, "on_battery": True}, or None on a Mac without a battery."""
     try:
@@ -129,7 +138,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             conn.close()
 
     def ai_status(self):
-        status = {"ollama": False, "models": [], "books": False, "lan": lan_address(), "port": PORT, "battery": battery()}
+        status = {"ollama": False, "models": [], "books": False, "lan": lan_address(), "port": PORT, "battery": battery(),
+                  "name": local_name()}
         try:
             tags = get_json(OLLAMA, "/api/tags") or {}
             status["ollama"] = True

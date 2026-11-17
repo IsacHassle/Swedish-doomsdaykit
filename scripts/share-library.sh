@@ -37,11 +37,13 @@ for i in $(seq 1 30); do curl -sf -o /dev/null "http://localhost:$LIB_PORT/catal
 python3 "$KIT/scripts/build-home.py" >/dev/null
 
 IP=$(ipconfig getifaddr en0 || ipconfig getifaddr en1)
+NAME=$(scutil --get LocalHostName 2>/dev/null)   # e.g. "Annas-MacBook-Air": stays the same when the IP changes
 echo ""
 echo "  KRISLÅDA är igång (${#zims[@]} bibliotek)."
 echo ""
 echo "  På den här Macen:        http://localhost:$WEB_PORT"
-[ -n "$IP" ] && echo "  På mobiler (samma wifi): http://$IP:$WEB_PORT"
+[ -n "$NAME" ] && echo "  På mobiler (samma wifi): http://$NAME.local:$WEB_PORT   (fungerar alltid på iPhone)"
+[ -n "$IP" ] && echo "                     eller: http://$IP:$WEB_PORT   (om den första inte fungerar, till exempel på Android)"
 echo ""
 echo "  Fråga AI:                http://localhost:$WEB_PORT/ai/"
 [ -n "$IP" ] && echo "  Fråga AI från mobilen:   http://$IP:$WEB_PORT/ai/"

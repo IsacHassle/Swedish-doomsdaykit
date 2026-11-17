@@ -61,7 +61,7 @@ Resten av sidan är bruksanvisningen. Samma text finns i utskriftsguiden, och AI
     - **29 akutknappar**: hjärt-lungräddning, blödning, brännskador, nedkylning, kolmonoxid, förgiftning, förlossning med mera. De flesta öppnar 1177:s eller MCF:s råd på svenska, med den engelska artikeln ett tryck bort
     - **Svenska myndigheters råd**: 63 sidor från 1177, MCF, Livsmedelsverket och Krisinformation, sparade för läsning utan internet
     - **de 10 viktigaste böckerna** som PDF, och **alla dokument**
-3. **Familjens mobiler:** anslut till samma wifi och öppna adressen som Terminal-fönstret visar (till exempel `http://192.168.1.23:8091`). Inget internet behövs. AI:n och kartan fungerar från mobilen också, Macen gör jobbet. En router på batteri fungerar, och Macens egen delade anslutning också. Tips: tryck **Dela → Lägg till på hemskärmen** (iPhone) eller **⋮ → Lägg till på startskärmen** (Android), så får mobilen en Krislåda-ikon.
+3. **Familjens mobiler:** anslut till samma wifi och öppna adressen som Terminal-fönstret visar, till exempel `http://Annas-MacBook-Air.local:8091` (samma adress varje gång, fungerar på iPhone) eller `http://192.168.1.23:8091` (kan ändras, fungerar överallt). Inget internet behövs. AI:n och kartan fungerar från mobilen också, Macen gör jobbet. Wifi-routern behöver ström: en router kopplad till en powerbank eller ett batteripaket räcker långt. Tips: tryck **Dela → Lägg till på hemskärmen** (iPhone) eller **⋮ → Lägg till på startskärmen** (Android), så får mobilen en Krislåda-ikon.
 
 | Jag behöver... | Gör så här |
 |---|---|
