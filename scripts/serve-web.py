@@ -1,0 +1,251 @@
+#!/usr/bin/env python3
+"""Serves web/ (start page, map, documents, AI page) to this Mac and to
+phones on the same Wi-Fi.
+
+- Files are served with Range support (the map needs it).
+- /ai-api/... lets the AI page talk to the local AI on this Mac:
+    Ollama (models "crisis" and "crisis-small") and AnythingLLM (workspace "Crisis").
+  Only these few actions are passed on, so phones on the Wi-Fi can ask
+  questions but cannot change settings or delete anything.
+
+Usage: python3 scripts/serve-web.py [port]
+Then open http://localhost:<port>/  (default port 8091)
+"""
+import http.client
+import http.server
+import json
+import os
+import re
+import subprocess
+import sys
+import urllib.parse
+
+KIT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # the kit folder
+ROOT = os.path.join(KIT, "web")
+DOCS = os.path.join(KIT, "documents")
+PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8091
+
+OLLAMA = ("127.0.0.1", 11434)
+ANYTHINGLLM = ("127.0.0.1", 3001)
+WORKSPACE = "crisis"
+MODELS = {"crisis", "crisis-small"}
+MAX_BODY = 30 * 1024 * 1024  # a few photos
+
+
+def upstream(host, method, path, body=None, timeout=900):
+    conn = http.client.HTTPConnection(*host, timeout=timeout)
+    conn.request(method, path, body=body, headers={"Content-Type": "application/json"})
+    return conn, conn.getresponse()
+
+
+def get_json(host, path):
+    conn, resp = upstream(host, "GET", path, timeout=3)
+    try:
+        return json.loads(resp.read()) if resp.status == 200 else None
+    finally:
+        conn.close()
+
+
+def lan_address():
+    """This Mac's address on the Wi-Fi, for phones to use."""
+    for iface in ("en0", "en1"):
+        try:
+            ip = subprocess.run(["ipconfig", "getifaddr", iface], capture_output=True, text=True, timeout=2).stdout.strip()
+            if ip:
+                return ip
+        except (OSError, subprocess.SubprocessError):
+            pass
+    return ""
+
+
+def doc_index():
+    """File name -> path under docs/, so the AI page can link a source to its PDF."""
+    found = {}
+    for folder, _, files in os.walk(DOCS):
+        for name in files:
+            rel = os.path.relpath(os.path.join(folder, name), DOCS)
+            found.setdefault(name, "docs/" + urllib.parse.quote(rel))
+    return found
+
+
+class Handler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=ROOT, **kwargs)
+
+    def end_headers(self):
+        self.send_header("Accept-Ranges", "bytes")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        super().end_headers()
+
+    # ---------- AI ----------
+
+    def send_json(self, obj, status=200):
+        data = json.dumps(obj, ensure_ascii=False).encode()
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(data)
+
+    def read_body(self):
+        n = int(self.headers.get("Content-Length") or 0)
+        if n <= 0 or n > MAX_BODY:
+            raise ValueError("empty or too large")
+        return json.loads(self.rfile.read(n))
+
+    def stream(self, host, path, payload):
+        """Pass a streaming answer through to the browser as it is written."""
+        try:
+            conn, resp = upstream(host, "POST", path, json.dumps(payload).encode())
+        except OSError:
+            return self.send_json({"error": "not running"}, 503)
+        try:
+            self.send_response(resp.status)
+            self.send_header("Content-Type", resp.getheader("Content-Type", "application/octet-stream"))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            while True:
+                chunk = resp.read1(65536)
+                if not chunk:
+                    break
+                self.wfile.write(chunk)
+                self.wfile.flush()
+        except (BrokenPipeError, ConnectionResetError):
+            pass  # the person pressed Stop or closed the page; closing stops the AI too
+        finally:
+            conn.close()
+
+    def ai_status(self):
+        status = {"ollama": False, "models": [], "books": False, "lan": lan_address(), "port": PORT}
+        try:
+            tags = get_json(OLLAMA, "/api/tags") or {}
+            status["ollama"] = True
+            names = {m["name"].split(":")[0] for m in tags.get("models", [])}
+            status["models"] = sorted(MODELS & names)
+        except OSError:
+            pass
+        try:
+            ws = get_json(ANYTHINGLLM, f"/api/workspace/{WORKSPACE}") or {}
+            status["books"] = bool(ws.get("workspace"))
+        except OSError:
+            pass
+        self.send_json(status)
+
+    def ai_post(self, action):
+        try:
+            body = self.read_body()
+        except (ValueError, json.JSONDecodeError):
+            return self.send_json({"error": "bad request"}, 400)
+
+        if action == "chat":  # Ollama, model crisis or crisis-small, photos allowed
+            model = body.get("model")
+            msgs = body.get("messages")
+            if model not in MODELS or not isinstance(msgs, list) or not msgs:
+                return self.send_json({"error": "bad request"}, 400)
+            clean = []
+            for m in msgs[-20:]:
+                if m.get("role") not in ("user", "assistant") or not isinstance(m.get("content"), str):
+                    return self.send_json({"error": "bad request"}, 400)
+                item = {"role": m["role"], "content": m["content"]}
+                imgs = m.get("images")
+                if isinstance(imgs, list) and all(isinstance(i, str) for i in imgs):
+                    item["images"] = imgs[:4]
+                clean.append(item)
+            return self.stream(OLLAMA, "/api/chat", {
+                "model": model, "messages": clean, "stream": True,
+                "think": bool(body.get("think")), "keep_alive": "30m",
+            })
+
+        if action == "books-new":  # a new conversation in the Crisis workspace
+            try:
+                conn, resp = upstream(ANYTHINGLLM, "POST", f"/api/workspace/{WORKSPACE}/thread/new", b"{}", timeout=10)
+                data = json.loads(resp.read())
+                conn.close()
+                return self.send_json({"thread": data["thread"]["slug"]})
+            except (OSError, KeyError, TypeError, ValueError):
+                return self.send_json({"error": "not running"}, 503)
+
+        if action == "books-chat":  # answer from the embedded books, with sources
+            thread, msg = body.get("thread", ""), body.get("message")
+            if not isinstance(thread, str) or not re.fullmatch(r"[0-9a-f-]{36}", thread) \
+                    or not isinstance(msg, str) or not msg.strip():
+                return self.send_json({"error": "bad request"}, 400)
+            return self.stream(ANYTHINGLLM, f"/api/workspace/{WORKSPACE}/thread/{thread}/stream-chat",
+                               {"message": msg[:8000], "reasoningEffort": "off"})  # no long hidden reasoning: answers in about 20 s instead of a minute
+
+        self.send_json({"error": "unknown"}, 404)
+
+    def do_POST(self):
+        m = re.fullmatch(r"/ai-api/([a-z-]+)", self.path.split("?")[0])
+        if not m:
+            return self.send_json({"error": "unknown"}, 404)
+        self.ai_post(m.group(1))
+
+    # ---------- files ----------
+
+    def do_GET(self):
+        url = urllib.parse.urlsplit(self.path)
+        if url.path == "/ai-api/status":
+            return self.ai_status()
+        if url.path == "/ai-api/doc":
+            name = urllib.parse.parse_qs(url.query).get("name", [""])[0]
+            href = doc_index().get(os.path.basename(name))
+            return self.send_json({"href": href} if href else {"error": "not found"}, 200 if href else 404)
+
+        rng = self.headers.get("Range")
+        path = self.translate_path(self.path)
+        if path.endswith(".json") and os.path.isfile(path + ".gz") and "gzip" in self.headers.get("Accept-Encoding", ""):
+            data = open(path + ".gz", "rb").read()  # the map's place search, sent compressed
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Encoding", "gzip")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+            return
+        if not rng or not os.path.isfile(path):
+            return super().do_GET()
+        m = re.match(r"bytes=(\d*)-(\d*)$", rng.strip())
+        size = os.path.getsize(path)
+        if not m:
+            self.send_error(416)
+            return
+        start_s, end_s = m.groups()
+        if start_s == "":
+            length = int(end_s)
+            start, end = max(size - length, 0), size - 1
+        else:
+            start = int(start_s)
+            end = int(end_s) if end_s else size - 1
+        end = min(end, size - 1)
+        if start > end or start >= size:
+            self.send_response(416)
+            self.send_header("Content-Range", f"bytes */{size}")
+            self.end_headers()
+            return
+        self.send_response(206)
+        self.send_header("Content-Type", self.guess_type(path))
+        self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
+        self.send_header("Content-Length", str(end - start + 1))
+        self.end_headers()
+        with open(path, "rb") as f:
+            f.seek(start)
+            remaining = end - start + 1
+            while remaining > 0:
+                chunk = f.read(min(1 << 20, remaining))
+                if not chunk:
+                    break
+                self.wfile.write(chunk)
+                remaining -= len(chunk)
+
+    def log_message(self, *args):
+        pass  # keep the terminal quiet
+
+
+if __name__ == "__main__":
+    http.server.ThreadingHTTPServer.allow_reuse_address = True
+    http.server.ThreadingHTTPServer.daemon_threads = True
+    with http.server.ThreadingHTTPServer(("0.0.0.0", PORT), Handler) as httpd:
+        print(f"Crisis kit on this Mac: http://localhost:{PORT}/")
+        httpd.serve_forever()

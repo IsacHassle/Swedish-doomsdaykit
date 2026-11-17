@@ -1,0 +1,20 @@
+# Only the kit's own code is in git. Everything downloaded or personal stays out:
+# ignore everything at the top level, then list what belongs in the repository.
+/*
+!/.gitignore
+!/README.md
+!/LICENSE
+!/CREDITS.md
+!/install.sh
+!/Start Crisis Kit.command
+!/Krislåda - guide to print.pdf
+!/config/
+!/scripts/
+!/web/
+!/docs/
+
+# Built or downloaded inside web/
+/web/index.html
+/web/map/data/
+.DS_Store
+__pycache__/
