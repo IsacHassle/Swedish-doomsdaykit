@@ -8,11 +8,17 @@ them and people can open them as PDFs:
   Ready.gov          the US FEMA guides for each kind of emergency, as text, plus their
                      info sheets and the "Are You Ready?" handbook
 
+Many books are in more than one collection (Post Disaster repeats most of the others). Each book is
+kept once, in its most specific collection: the collections are read with Post Disaster last, and a
+PDF identical to one already taken is skipped. Fewer copies also means the AI gets six different
+passages instead of the same one twice.
+
 Run with the kit's Python (made by scripts/get-tools.sh):
     tools/venv/bin/python scripts/extract-documents.py
 Safe to re-run: files that already exist are left alone.
 """
 import glob
+import hashlib
 import json
 import os
 import re
@@ -24,6 +30,8 @@ from markdownify import markdownify
 KIT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LIB = os.path.join(KIT, "library")
 OUT = os.path.join(KIT, "documents", "library")
+MIXED = "zimgit-post-disaster_en"   # repeats books from the other collections, so it is read last
+SEEN = set()                        # every PDF taken so far, by content
 
 
 def archive(prefix):
@@ -39,6 +47,11 @@ def entries(z):
 
 
 def save(path, data):
+    if isinstance(data, bytes):
+        digest = hashlib.sha256(data).digest()
+        if digest in SEEN:          # the same book under another name or in another collection
+            return 0
+        SEEN.add(digest)
     if os.path.exists(path):
         return 0
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -51,9 +64,11 @@ def safe(name):
     return re.sub(r'[/:\\]', '-', name).strip()
 
 
-def pdf_collections():
+def pdf_collections(mixed=False):
     cfg = json.load(open(os.path.join(KIT, "config", "document-names.json")))
     for prefix, folder in cfg["folders"].items():
+        if (prefix == MIXED) != mixed:
+            continue
         z = archive(prefix)
         if not z:
             print(f"  {folder}: biblioteket är inte hämtat, hoppar över")
@@ -152,3 +167,4 @@ if __name__ == "__main__":
     pdf_collections()
     nhs_medicines()
     ready_gov()
+    pdf_collections(mixed=True)

@@ -1,10 +1,10 @@
 {
  "folders": {
-  "zimgit-medicine_en": "Medical Library",
-  "irp.fas.org_en_military-medicine": "Military Medicine",
+  "zimgit-knots_en": "Knots",
   "zimgit-water_en": "Water Treatment",
   "zimgit-food-preparation_en": "Food for Preppers",
-  "zimgit-knots_en": "Knots",
+  "irp.fas.org_en_military-medicine": "Military Medicine",
+  "zimgit-medicine_en": "Medical Library",
   "zimgit-post-disaster_en": "Post Disaster"
  },
  "names": {
@@ -77,7 +77,7 @@
    "files/Food Preparation (8).pdf": "Food for Preppers/Unusual Old World and American Recipes.pdf"
   },
   "zimgit-knots_en": {
-   "files/Knots (1).pdf": "Medical Library/Encyclopedia of Knots.pdf",
+   "files/Knots (1).pdf": "Knots/Encyclopedia of Knots.pdf",
    "files/Knots (10).pdf": "Knots/Pioneering Knots and Lashings.pdf",
    "files/Knots (11).pdf": "Knots/Knots.pdf",
    "files/Knots (2).pdf": "Knots/Take me fishing.pdf",

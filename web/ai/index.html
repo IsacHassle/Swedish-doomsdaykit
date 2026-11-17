@@ -73,7 +73,7 @@
   <div id="fix"></div>
 
   <div class="modes" role="radiogroup" aria-label="Välj läge">
-    <label class="mode" data-hint="Söker i krislådans böcker och visar källan. 10 till 40 sekunder."><input type="radio" name="mode" value="books">Ur böckerna</label>
+    <label class="mode" data-hint="Läser krislådans böcker och de medicinska biblioteken (WikiMed, MedlinePlus) och visar källorna. 10 till 40 sekunder."><input type="radio" name="mode" value="books">Ur böckerna</label>
     <label class="mode" data-hint="Samma AI utan böckerna. Snabbare, och kan titta på foton."><input type="radio" name="mode" value="crisis">Snabbt svar</label>
     <label class="mode" data-hint="Mindre AI som drar mindre ström. Enklare svar."><input type="radio" name="mode" value="crisis-small">Spara batteri</label>
   </div>
@@ -107,7 +107,7 @@
     </div></details>
     <details class="more guide"><summary>Så använder du AI:n</summary><div class="inner">
       <ol>
-        <li><b>Välj läge.</b> <i>Ur böckerna</i> för det mesta: svaret bygger på krislådans böcker och du ser källorna under svaret. <i>Snabbt svar</i> när det är bråttom eller för foton. <i>Spara batteri</i> när datorn går på batteri.</li>
+        <li><b>Välj läge.</b> <i>Ur böckerna</i> för det mesta: svaret bygger på krislådans böcker och de medicinska biblioteken, och du ser källorna under svaret. <i>Snabbt svar</i> när det är bråttom eller för foton. <i>Spara batteri</i> när datorn går på batteri.</li>
         <li><b>Skriv som när du ringer 1177.</b> Vem (ålder, vikt för barn), vad som hände, när, vad du ser och vad du har hemma.
           <div class="example">Exempel: Min pappa är 72 år. Han föll i trappan för 20 minuter sedan och slog i huvudet. Han blöder lite från pannan och verkar förvirrad. Vi har plåster, kompresser och Alvedon. Vad ska vi göra?</div></li>
         <li><b>Fortsätt fråga.</b> AI:n minns samtalet. Tryck <i>Ny konversation</i> när du byter ämne.</li>
@@ -119,14 +119,14 @@
       </ol>
       <h3>Andra sätt på datorn</h3>
       <table>
-        <tr><td>AnythingLLM, arbetsytan Crisis</td><td>Samma som Ur böckerna. Där finns tidigare samtal, och du kan dra in egna filer.</td></tr>
+        <tr><td>AnythingLLM, arbetsytan Crisis</td><td>Svarar ur böckerna, men inte ur WikiMed och MedlinePlus. Du kan dra in egna filer där.</td></tr>
         <tr><td>Ollama, modellen crisis</td><td>Samma som Snabbt svar. Dra in ett foto för att fråga om det.</td></tr>
         <tr><td>Terminal</td><td><code>ollama run crisis</code>, avsluta med <code>/bye</code>.</td></tr>
       </table>
     </div></details>
   </section>
 
-  <footer class="kit">AI-modeller: Gemma 4 26B och E4B. Sökning i böckerna: AnythingLLM och bge-m3.</footer>
+  <footer class="kit">AI-modeller: Gemma 4 26B och E4B. Sökning: AnythingLLM och bge-m3 i böckerna, Kiwix i WikiMed, MDWiki och MedlinePlus.</footer>
 </main>
 
 <script>
@@ -134,19 +134,22 @@
   const $ = s => document.querySelector(s);
   const log = $('#log'), q = $('#q'), sendBtn = $('#send'), thumbs = $('#thumbs');
   const LABEL = { 'books': 'Ur böckerna', 'crisis': 'Snabbt svar', 'crisis-small': 'Spara batteri' };
-  let status = null, mode = null, thread = null, history = [], photos = [], busy = null;
+  const KIWIX = `http://${location.hostname}:8090`;   // the libraries (always http)
+  let status = null, mode = null, history = [], photos = [], busy = null;
 
   // ---------- status ----------
   async function checkStatus() {
     try { status = await (await fetch('/ai-api/status', { cache: 'no-store' })).json(); }
-    catch { status = { ollama: false, models: [], books: false }; }
-    const avail = { 'books': status.books, 'crisis': status.models.includes('crisis'), 'crisis-small': status.models.includes('crisis-small') };
+    catch { status = { ollama: false, models: [], books: false, libraries: false }; }
+    const avail = { 'books': status.models.includes('crisis') && (status.books || status.libraries), 'crisis': status.models.includes('crisis'), 'crisis-small': status.models.includes('crisis-small') };
     document.querySelectorAll('input[name=mode]').forEach(i => { i.disabled = !avail[i.value]; });
     const s = [], fix = [];
     s.push(status.ollama ? '<span class="lamp">AI-motor: igång</span>' : '<span class="lamp off">AI-motor: av</span>');
     s.push(status.books ? '<span class="lamp">Böckerna: igång</span>' : '<span class="lamp off">Böckerna: av</span>');
+    s.push(status.libraries ? '<span class="lamp">Biblioteken: igång</span>' : '<span class="lamp off">Biblioteken: av</span>');
     if (!status.ollama) fix.push('Öppna appen Ollama och vänta tio sekunder.');
     if (!status.books) fix.push('För svar ur böckerna: öppna appen AnythingLLM.');
+    if (!status.libraries) fix.push('Biblioteken är av: dubbelklicka Starta Krislåda.command.');
     const b = status.battery;
     if (b && b.on_battery) {
       s.push(`<span class="lamp warn">Batteri: ${b.percent} %</span>`);
@@ -169,7 +172,7 @@
     if (mode && mode !== m && log.children.length && !quiet) {
       add('div', 'sep', 'Nytt läge: ' + LABEL[m] + '. AI:n börjar om utan det tidigare samtalet.');
     }
-    if (mode !== m) { thread = null; history = []; }
+    if (mode !== m) history = [];
     mode = m;
     return true;
   }
@@ -270,47 +273,32 @@
     photos = []; drawThumbs(); q.value = '';
 
     const box = add('div', 'msg ai');
-    box.innerHTML = '<div class="wait">Tänker… 0 s</div>';
     const t0 = Date.now(), used = mode;
-    let raw = '', sources = [], failed = null, shown = false;
-    const tick = setInterval(() => { if (!shown) box.querySelector('.wait').textContent = `Tänker… ${Math.round((Date.now() - t0) / 1000)} s`; }, 1000);
+    let raw = '', sources = [], failed = null, shown = false, doing = used === 'books' ? 'Söker i böckerna' : 'Tänker';
+    box.innerHTML = `<div class="wait">${doing}… 0 s</div>`;
+    const tick = setInterval(() => { if (!shown) box.querySelector('.wait').textContent = `${doing}… ${Math.round((Date.now() - t0) / 1000)} s`; }, 1000);
     const paint = () => { const v = visible(raw); if (v) { shown = true; box.innerHTML = md(v); } };
 
     const ctrl = new AbortController();
     busy = ctrl; sendBtn.textContent = 'Stopp'; sendBtn.className = 'stop';
     try {
-      if (used === 'books') {
-        if (!thread) {
-          const r = await fetch('/ai-api/books-new', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
-          if (!r.ok) throw new Error('books');
-          thread = (await r.json()).thread;
-        }
-        const r = await fetch('/ai-api/books-chat', { method: 'POST', signal: ctrl.signal, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ thread, message: text }) });
-        if (!r.ok) throw new Error('books');
-        await readStream(r, line => {
-          if (!line.startsWith('data:')) return;
-          let d; try { d = JSON.parse(line.slice(5)); } catch { return; }
-          if (d.error) failed = typeof d.error === 'string' ? d.error : 'fel';
-          if (d.textResponse) { raw += d.textResponse; paint(); }
-          if (d.sources && d.sources.length) sources = d.sources;
-        });
-      } else {
-        history.push({ role: 'user', content: text, ...(imgs.length ? { images: imgs } : {}) });
-        const r = await fetch('/ai-api/chat', { method: 'POST', signal: ctrl.signal, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: used, messages: history }) });
-        if (!r.ok) throw new Error('ollama');
-        await readStream(r, line => {
-          let d; try { d = JSON.parse(line); } catch { return; }
-          if (d.error) failed = d.error;
-          if (d.message && d.message.content) { raw += d.message.content; paint(); }
-        });
-        if (raw) history.push({ role: 'assistant', content: visible(raw) });
-        else history.pop();
-      }
+      // "Ur böckerna" first sends the sources it found (one line), then the answer, like the other modes.
+      history.push({ role: 'user', content: text, ...(imgs.length ? { images: imgs } : {}) });
+      const books = used === 'books';
+      const r = await fetch(books ? '/ai-api/books-chat' : '/ai-api/chat', { method: 'POST', signal: ctrl.signal,
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(books ? { messages: history } : { model: used, messages: history }) });
+      if (!r.ok) { history.pop(); throw new Error('ollama'); }
+      await readStream(r, line => {
+        let d; try { d = JSON.parse(line); } catch { return; }
+        if (d.sources) { sources = d.sources; doing = sources.length ? `Läser ${sources.length} källor` : 'Tänker'; }
+        if (d.error) failed = d.error;
+        if (d.message && d.message.content) { raw += d.message.content; paint(); }
+      });
+      if (raw) history.push({ role: 'assistant', content: visible(raw) });
+      else history.pop();
     } catch (e) {
       if (e.name === 'AbortError') failed = 'stopped';
-      else failed = e.message === 'books' ? 'Böckerna svarar inte. Öppna appen AnythingLLM, vänta tills den startat, och försök igen. Eller välj Snabbt svar.'
-                                           : 'AI-motorn svarar inte. Öppna appen Ollama, vänta tio sekunder och försök igen.';
-      if (used === 'books' && e.message === 'books') thread = null;
+      else failed = 'AI-motorn svarar inte. Öppna appen Ollama, vänta tio sekunder och försök igen.';
     } finally {
       clearInterval(tick);
       busy = null; sendBtn.textContent = 'Skicka'; sendBtn.className = '';
@@ -322,14 +310,21 @@
     const secs = Math.round((Date.now() - t0) / 1000);
     box.insertAdjacentHTML('beforeend', `<div class="meta">${LABEL[used]} · ${secs} s</div>`);
 
-    const titles = [...new Set(sources.map(s => s.title).filter(Boolean))];
-    if (titles.length) {
+    // The kit's books open as PDFs or in the reader; library articles open in Kiwix.
+    const seen = new Set(), list = sources.filter(s => s.title && !seen.has(s.title + s.library) && seen.add(s.title + s.library));
+    if (list.length) {
       const src = document.createElement('div');
       src.className = 'src';
       src.innerHTML = '<b>Källor:</b> ';
       box.appendChild(src);
-      for (const t of titles) {
-        const name = t.replace(/\.json$/, '');
+      for (const s of list) {
+        if (s.href) {
+          const a = document.createElement('a');
+          a.target = '_blank'; a.href = KIWIX + s.href; a.textContent = `${s.library}: ${s.title}`;
+          src.appendChild(a);
+          continue;
+        }
+        const name = s.title.replace(/\.json$/, '');
         let el;
         try {
           const r = await fetch('/ai-api/doc?name=' + encodeURIComponent(name));
@@ -359,7 +354,7 @@
   });
   $('#new').addEventListener('click', () => {
     if (busy) busy.abort();
-    thread = null; history = []; photos = []; drawThumbs(); log.innerHTML = ''; q.value = ''; q.focus();
+    history = []; photos = []; drawThumbs(); log.innerHTML = ''; q.value = ''; q.focus();
   });
   document.querySelectorAll('#examples button').forEach(b => b.addEventListener('click', () => {
     if (b.dataset.photo) { setMode(status && status.models.includes('crisis') ? 'crisis' : 'crisis-small'); $('#photo').click(); return; }

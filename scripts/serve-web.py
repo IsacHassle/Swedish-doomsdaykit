@@ -4,7 +4,9 @@ phones on the same Wi-Fi.
 
 - Files are served with Range support (the map needs it).
 - /ai-api/... lets the AI page talk to the local AI on this Mac:
-    Ollama (models "crisis" and "crisis-small") and AnythingLLM (workspace "Crisis").
+    Ollama (models "crisis" and "crisis-small"). In "Ur böckerna" the AI first gets
+    excerpts from the kit's books (AnythingLLM, workspace "Crisis") and from the big
+    medical libraries in Kiwix (scripts/kit_search.py).
   Only these few actions are passed on, so phones on the Wi-Fi can ask
   questions but cannot change settings or delete anything.
 
@@ -22,17 +24,20 @@ import sys
 import threading
 import urllib.parse
 
-import kit_gps   # the USB GPS receiver, if one is plugged in (scripts/kit_gps.py)
+import kit_gps      # the USB GPS receiver, if one is plugged in (scripts/kit_gps.py)
+import kit_search   # what the AI reads before answering in "Ur böckerna" (scripts/kit_search.py)
 
 KIT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # the kit folder
 ROOT = os.path.join(KIT, "web")
 DOCS = os.path.join(KIT, "documents")
+PROMPT = os.path.join(KIT, "config", "AI-PROMPT.txt")
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8091
 HTTPS_PORT = PORT + 352   # 8443: the same site over https, so phones allow the map to use their GPS
 CERTS = os.path.join(KIT, "tools", "certs")
 
 OLLAMA = ("127.0.0.1", 11434)
 ANYTHINGLLM = ("127.0.0.1", 3001)
+KIWIX = ("127.0.0.1", 8090)
 WORKSPACE = "crisis"
 MODELS = {"crisis", "crisis-small"}
 MAX_BODY = 30 * 1024 * 1024  # a few photos
@@ -125,8 +130,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             raise ValueError("empty or too large")
         return json.loads(self.rfile.read(n))
 
-    def stream(self, host, path, payload):
-        """Pass a streaming answer through to the browser as it is written."""
+    def stream(self, host, path, payload, first=b""):
+        """Pass a streaming answer through to the browser as it is written (after `first`, if given)."""
         try:
             conn, resp = upstream(host, "POST", path, json.dumps(payload).encode())
         except OSError:
@@ -136,6 +141,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.send_header("Content-Type", resp.getheader("Content-Type", "application/octet-stream"))
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
+            if first and resp.status == 200:
+                self.wfile.write(first)
+                self.wfile.flush()
             while True:
                 chunk = resp.read1(65536)
                 if not chunk:
@@ -148,7 +156,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             conn.close()
 
     def ai_status(self):
-        status = {"ollama": False, "models": [], "books": False, "lan": lan_address(), "port": PORT, "battery": battery(),
+        status = {"ollama": False, "models": [], "books": False, "libraries": False, "lan": lan_address(), "port": PORT,
+                  "battery": battery(),
                   "name": local_name(), "https_port": HTTPS_PORT if https_ready() else None}
         try:
             tags = get_json(OLLAMA, "/api/tags") or {}
@@ -160,6 +169,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         try:
             ws = get_json(ANYTHINGLLM, f"/api/workspace/{WORKSPACE}") or {}
             status["books"] = bool(ws.get("workspace"))
+        except OSError:
+            pass
+        try:
+            conn, resp = upstream(KIWIX, "GET", "/catalog/v2/entries?count=1", timeout=2)
+            status["libraries"] = resp.status == 200
+            conn.close()
         except OSError:
             pass
         self.send_json(status)
@@ -187,24 +202,34 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.stream(OLLAMA, "/api/chat", {
                 "model": model, "messages": clean, "stream": True,
                 "think": bool(body.get("think")), "keep_alive": "30m",
+                # the same context size as "Ur böckerna", so switching mode does not reload the model
+                **({"options": kit_search.OPTIONS} if model == kit_search.MODEL else {}),
             })
 
-        if action == "books-new":  # a new conversation in the Crisis workspace
-            try:
-                conn, resp = upstream(ANYTHINGLLM, "POST", f"/api/workspace/{WORKSPACE}/thread/new", b"{}", timeout=10)
-                data = json.loads(resp.read())
-                conn.close()
-                return self.send_json({"thread": data["thread"]["slug"]})
-            except (OSError, KeyError, TypeError, ValueError):
-                return self.send_json({"error": "not running"}, 503)
-
-        if action == "books-chat":  # answer from the embedded books, with sources
-            thread, msg = body.get("thread", ""), body.get("message")
-            if not isinstance(thread, str) or not re.fullmatch(r"[0-9a-f-]{36}", thread) \
-                    or not isinstance(msg, str) or not msg.strip():
+        if action == "books-chat":  # answer from the kit's books and the big medical libraries, with sources
+            msgs = body.get("messages")
+            if not isinstance(msgs, list) or not msgs:
                 return self.send_json({"error": "bad request"}, 400)
-            return self.stream(ANYTHINGLLM, f"/api/workspace/{WORKSPACE}/thread/{thread}/stream-chat",
-                               {"message": msg[:8000], "reasoningEffort": "off"})  # no long hidden reasoning: answers in about 20 s instead of a minute
+            clean = []
+            for m in msgs[-12:]:
+                if not isinstance(m, dict) or m.get("role") not in ("user", "assistant") or not isinstance(m.get("content"), str):
+                    return self.send_json({"error": "bad request"}, 400)
+                clean.append({"role": m["role"], "content": m["content"][:8000]})
+            asked = [m["content"] for m in clean if m["role"] == "user"]
+            if clean[-1]["role"] != "user" or not asked[-1].strip():
+                return self.send_json({"error": "bad request"}, 400)
+            passages, articles = kit_search.gather(asked[-1], asked[-2] if len(asked) > 1 else "")
+            try:
+                base = open(PROMPT, encoding="utf-8").read()
+            except OSError:
+                base = ""
+            sources = [{"title": p["title"]} for p in passages] + \
+                      [{"title": a["title"], "library": a["library"], "href": a["href"]} for a in articles]
+            return self.stream(OLLAMA, "/api/chat", {
+                "model": kit_search.MODEL, "stream": True, "think": False, "keep_alive": "30m",
+                "options": kit_search.OPTIONS,
+                "messages": [{"role": "system", "content": kit_search.system_prompt(base, passages, articles)}] + clean,
+            }, first=json.dumps({"sources": sources}, ensure_ascii=False).encode() + b"\n")
 
         if action == "gps-share":  # a phone lends the Mac its GPS (web/mobil/)
             try:

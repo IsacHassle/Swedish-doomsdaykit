@@ -85,7 +85,7 @@ AI:n körs helt på Macen. Öppna den från startsidan: **Fråga AI** (eller dir
 
     | Läge | Använd när | Tid |
     |---|---|---|
-    | **Ur böckerna** | Det mesta: skador, sjukdom, läkemedel, vatten, mat, värme, myndigheternas råd. Den läser krislådans böcker (1177, MCF och Livsmedelsverket på svenska, sjukvårdsböcker, NHS läkemedelsfakta, vattenrening, mat, MCF-broschyren, Ready.gov-guiderna) och visar vilka böcker svaret bygger på. Tryck på en för att öppna den | Cirka 10 till 40 s |
+    | **Ur böckerna** | Det mesta: skador, sjukdom, läkemedel, vatten, mat, värme, myndigheternas råd. Den läser krislådans böcker (1177, MCF och Livsmedelsverket på svenska, sjukvårdsböcker, NHS läkemedelsfakta, vattenrening, mat, MCF-broschyren, Ready.gov-guiderna) och artiklar ur de stora medicinska biblioteken (WikiMed, MDWiki, MedlinePlus), och visar källorna under svaret. Tryck på en för att öppna den | Cirka 10 till 40 s |
     | **Snabbt svar** | När det är bråttom, eller för att fråga om ett **foto**. Samma stora AI, utan böckerna | Cirka 5 till 20 s |
     | **Spara batteri** | När Macen går på batteri och du inte vet när du kan ladda. Mindre AI, enklare svar, tar också foton | Snabbare, lättare |
 
@@ -95,7 +95,7 @@ AI:n körs helt på Macen. Öppna den från startsidan: **Fråga AI** (eller dir
 5. **Prata i stället för att skriva:** Macens diktering (🎤-tangenten, eller Fn två gånger), eller mikrofonen på mobilens tangentbord.
 6. **Kontrollera det viktiga.** AI kan ha fel. Öppna källan under svaret, särskilt för doser. Ät aldrig en svamp eller växt för att AI:n säger att den är ätlig.
 7. **Spara ström:** AI:n drar mycket ström medan den svarar. Ställ få och tydliga frågor, välj Spara batteri, stäng andra appar.
-8. **Om det inte fungerar** visar raden högst upp på AI-sidan vad som saknas: öppna appen **Ollama** för AI-motorn, eller appen **AnythingLLM** för böckerna. Första svaret efter start tar längre tid medan AI:n laddas.
+8. **Om det inte fungerar** visar raden högst upp på AI-sidan vad som saknas: öppna appen **Ollama** för AI-motorn, eller appen **AnythingLLM** för böckerna (utan den svarar Ur böckerna bara ur biblioteken). Första svaret efter start tar längre tid medan AI:n laddas.
 
 Livsfara går först: ring **112** om någon telefon fungerar, och använd **Akut**-knapparna i stället för att vänta på ett svar från AI:n.
 
@@ -103,7 +103,7 @@ Livsfara går först: ring **112** om någon telefon fungerar, och använd **Aku
 
 | Var | Modell | När |
 |---|---|---|
-| Appen **AnythingLLM**, arbetsytan **Crisis** | Gemma 4 26B via Ollama | Samma som Ur böckerna. Visar också tidigare samtal (även de från AI-sidan), och du kan dra in egna filer |
+| Appen **AnythingLLM**, arbetsytan **Crisis** | Gemma 4 26B via Ollama | Svarar ur böckerna, men inte ur WikiMed, MDWiki och MedlinePlus. Du kan dra in egna filer där |
 | Appen **Ollama**, modellen **crisis** | Gemma 4 26B med krisinstruktionerna inbyggda | Samma som Snabbt svar. Dra in ett foto i rutan för att fråga om det |
 | Appen **Ollama**, modellen **crisis-small** | Gemma 4 E4B, samma instruktioner | Samma som Spara batteri |
 | Terminal: `ollama run crisis` | | Skriv frågan, `/bye` för att avsluta |
@@ -177,7 +177,7 @@ Lägg filer i krislådans mapp `documents/` (kontaktlistor, läkemedelslistor, f
 | `Starta Krislåda.command` | Dubbelklicka för att starta allt |
 | `Kontrollera Krislåda.command` | Dubbelklicka för att kontrollera att allt fungerar |
 | `config/` | `libraries.txt` (vilka bibliotek), `swedish-pages.txt` (vilka myndighetssidor), `AI-PROMPT.txt` (AI:ns instruktioner), `document-names.json` (boktitlar) |
-| `scripts/` | `share-library.sh` (start), `serve-web.py` (webbservern, och kopplingen mellan AI-sidan och Ollama/AnythingLLM), `build-home.py` (startsidan), nedladdningsstegen `get-*.sh`, `setup-ai.sh`, `embed-documents.sh`, `extract-documents.py`, `fetch-swedish-pages.py` (myndigheternas råd), `update-libraries.sh`, `kontroll.sh`, `make-cert.sh` (https för mobilens GPS), `build-map-index.py` (kartans sökning) |
+| `scripts/` | `share-library.sh` (start), `serve-web.py` (webbservern, och kopplingen mellan AI-sidan och Ollama/AnythingLLM), `kit_search.py` (det AI:n läser i Ur böckerna), `build-home.py` (startsidan), nedladdningsstegen `get-*.sh`, `setup-ai.sh`, `embed-documents.sh`, `extract-documents.py`, `fetch-swedish-pages.py` (myndigheternas råd), `update-libraries.sh`, `kontroll.sh`, `make-cert.sh` (https för mobilens GPS), `build-map-index.py` (kartans sökning) |
 | `web/` | Startsidan, AI-sidan (`web/ai/`), kartan (`web/map/`), läsaren för textdokument (`web/las/`), utskriftspaketet (`web/skriv-ut/`), checklistan (`web/checklista/`) och GPS-inställningen för mobiler (`web/mobil/`) |
 | `library/` | Biblioteken (.zim-filer), nedladdade. Appen Kiwix kan också öppna dem |
 | `documents/` | MCF-broschyren, och `library/` med varje bok som PDF, namngiven efter titel |
@@ -209,4 +209,4 @@ Krislådan är inte medicinsk rådgivning och ersätter inte räddningstjänsten
 
 ## In English
 
-Krislåda is an offline crisis kit for Sweden on a Mac with Apple Silicon: medical libraries and 29 one-tap emergency topics, a local AI (Ollama and AnythingLLM) that answers in Swedish from the kit's books and can look at photos, an offline map of all of Sweden with search for every town, street and address, and the official Swedish brochure *In case of crisis or war*. Phones on the same Wi-Fi can use it too. Install with the one line above (or download `Krislada.zip` and double-click `Installera Krislåda.command`); it needs about 50 GB and a few hours of downloading, then works with no internet. Sources and licences are in `CREDITS.md`.
+Krislåda is an offline crisis kit for Sweden on a Mac with Apple Silicon: medical libraries and 29 one-tap emergency topics, a local AI (Ollama and AnythingLLM) that answers in Swedish from the kit's books and medical libraries and can look at photos, an offline map of all of Sweden with search for every town, street and address, and the official Swedish brochure *In case of crisis or war*. Phones on the same Wi-Fi can use it too. Install with the one line above (or download `Krislada.zip` and double-click `Installera Krislåda.command`); it needs about 50 GB and a few hours of downloading, then works with no internet. Sources and licences are in `CREDITS.md`.
