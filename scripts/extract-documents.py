@@ -73,10 +73,11 @@ def nhs_medicines():
         return
     n = 0
     for e, it in entries(z):
-        if not it.mimetype.startswith("text/html") or not re.match(r"www\.nhs\.uk/medicines/[^/]+/[^/]+/$", e.path):
+        if not it.mimetype.startswith("text/html") or not re.match(r"www\.nhs\.uk/medicines/.+/$", e.path):
             continue
-        title = re.sub(r"\s*-\s*NHS\s*$", "", e.title).strip()
         soup = BeautifulSoup(bytes(it.content), "html.parser")
+        raw = soup.title.get_text() if soup.title else e.title   # the page title, not its heading (that adds brand names)
+        title = re.sub(r"\s*-\s*NHS\s*$", "", " ".join(raw.split())).replace("\u2019", "'").strip()
         main = soup.find("main") or soup.body
         for tag in main.select("nav, script, style, form, footer, aside, .nhsuk-review-date, .nhsuk-breadcrumb"):
             tag.decompose()
