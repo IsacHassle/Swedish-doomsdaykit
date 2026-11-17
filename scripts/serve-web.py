@@ -206,6 +206,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.stream(ANYTHINGLLM, f"/api/workspace/{WORKSPACE}/thread/{thread}/stream-chat",
                                {"message": msg[:8000], "reasoningEffort": "off"})  # no long hidden reasoning: answers in about 20 s instead of a minute
 
+        if action == "gps-share":  # a phone lends the Mac its GPS (web/mobil/)
+            try:
+                kit_gps.share(body.get("lat"), body.get("lon"), body.get("accuracy"))
+            except (TypeError, ValueError):
+                return self.send_json({"error": "bad request"}, 400)
+            return self.send_json({"ok": True})
+
         self.send_json({"error": "unknown"}, 404)
 
     def do_POST(self):

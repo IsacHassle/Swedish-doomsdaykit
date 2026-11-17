@@ -19,17 +19,41 @@ BAUDS = [termios.B9600, termios.B4800, termios.B38400, termios.B115200]
 
 _lock = threading.Lock()
 _state = {"device": None, "fix": False}
+_phone = {}   # the last position a phone shared (web/mobil/), used when there is no USB receiver
+PHONE_FRESH_S = 30
 
 
 def status():
-    """The latest reading: {"device", "fix", "lat", "lon", "sats", "accuracy_m", "age_s", ...}."""
+    """The latest reading: {"device", "fix", "lat", "lon", "sats", "accuracy_m", "age_s", "source", ...}.
+
+    A USB receiver with a position comes first; otherwise a position a phone shared in the last 30 s.
+    """
     with _lock:
         s = dict(_state)
+        phone = dict(_phone)
     if s.get("updated"):
         s["age_s"] = round(time.time() - s.pop("updated"), 1)
         if s["age_s"] > 10:          # the receiver stopped talking
             s["fix"] = False
+    s.pop("updated", None)
+    if s.get("fix"):
+        s["source"] = "usb"
+        return s
+    if phone and time.time() - phone["updated"] < PHONE_FRESH_S:
+        age = round(time.time() - phone.pop("updated"), 1)
+        return {**phone, "device": s.get("device") or "mobil", "fix": True, "source": "phone", "age_s": age,
+                "usb_device": s.get("device")}
     return s
+
+
+def share(lat, lon, accuracy_m):
+    """A phone on the Wi-Fi shares its GPS position (from web/mobil/)."""
+    lat, lon = float(lat), float(lon)
+    if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+        raise ValueError("position out of range")
+    acc = max(0.0, min(float(accuracy_m or 0), 100000.0))
+    with _lock:
+        _phone.update(lat=round(lat, 6), lon=round(lon, 6), accuracy_m=round(acc, 1), updated=time.time())
 
 
 def _set(**kw):

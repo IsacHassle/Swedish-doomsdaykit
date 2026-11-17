@@ -316,7 +316,8 @@
       this.usb = !!g.device;
       if (g.device && g.fix) {
         const acc = g.accuracy_m ? `, ±${Math.round(g.accuracy_m)} m` : '';
-        return this.show(map, g.lon, g.lat, g.accuracy_m, `Du är här (GPS, ${g.sats || '?'} satelliter${acc})`);
+        const what = g.source === 'phone' ? 'mobilens GPS' : `GPS, ${g.sats || '?'} satelliter`;
+        return this.show(map, g.lon, g.lat, g.accuracy_m, `Du är här (${what}${acc})`);
       }
       if (g.device) {
         return note(`GPS-mottagaren söker satelliter${g.sats_in_view ? ` (${g.sats_in_view} syns)` : ''}. Ställ datorn vid ett fönster eller gå ut. Första gången kan det ta några minuter.`);
@@ -347,7 +348,7 @@
       note('');
     },
   };
-  const NO_GPS = 'Ingen GPS hittades. Macen har ingen egen GPS: koppla in en USB GPS-mottagare (se guiden). Utan GPS: sök på en gata, adress eller plats du ser omkring dig.';
+  const NO_GPS = 'Ingen GPS hittades. Macen har ingen egen GPS: koppla in en USB GPS-mottagare, eller låt mobilen vara GPS: öppna <b>/mobil/</b> på mobilen och tryck <b>Dela min position med Macen</b>. Utan GPS: sök på en gata, adress eller plats du ser omkring dig.';
   const circle = (lon, lat, m) => {
     const pts = [];
     for (let i = 0; i <= 48; i++) {
