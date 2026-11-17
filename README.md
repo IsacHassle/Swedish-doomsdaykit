@@ -20,7 +20,7 @@ Allt körs på din egen dator. Inget skickas någonstans.
 
 ### Sätt 1: ladda ner och dubbelklicka
 
-1. **[⬇️ Ladda ner Krislåda](https://github.com/IsacHassle/Swedish-doomsdaykit/releases/latest/download/Krislada.zip)** (en liten fil, under 1 MB).
+1. **[⬇️ Ladda ner Krislåda](https://github.com/IsacHassle/Swedish-doomsdaykit/releases/latest/download/Krislada.zip)** (cirka 11 MB).
 2. Öppna **Hämtade filer** och dubbelklicka på **Krislada.zip**. Du får en mapp som heter **Krislåda**.
 3. Öppna mappen och dubbelklicka på **Installera Krislåda.command**.
 4. Macen säger troligen att den inte kan kontrollera filen, eftersom den inte kommer från App Store. Klicka **Klar**, öppna **Systeminställningar → Integritet och säkerhet**, scrolla ner och klicka **Öppna ändå** vid "Installera Krislåda.command". Bekräfta med ditt lösenord eller Touch ID.
